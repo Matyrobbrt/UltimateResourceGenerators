@@ -1,6 +1,6 @@
 {
 	"parent": "block/cube_all",
 	"textures": {
-		"all": "urg:block/generic_generator"
+		"all": "urg:block/tab_icon"
 	}
 }

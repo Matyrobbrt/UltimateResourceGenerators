@@ -41,6 +41,7 @@ import net.minecraft.block.AbstractBlock.Properties;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
 
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class GeneratorBlockParser {
@@ -48,8 +49,22 @@ public class GeneratorBlockParser {
 	public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
 	public static GeneratorBlock generatorFromJson(JsonObject obj) {
-		GeneratorBlock generator = new GeneratorBlock(Properties.of(Material.METAL));
+		Properties properties = Properties.of(Material.HEAVY_METAL);
 		//@formatter:off
+		JsonParser.begin(obj)
+			.ifKey("harvest_tool", val -> properties.harvestTool(ToolType.get(val.string())), () -> properties.harvestTool(ToolType.PICKAXE))
+			.ifKey("harvest_level", val -> properties.harvestLevel(val.integer()), () -> properties.harvestLevel(1))
+			.ifKey("requires_correct_tool_for_drops", val -> {
+				if (val.booleanValue()) {
+					properties.requiresCorrectToolForDrops();
+				}
+			})
+			.ifKey("no_occlusion", val -> {
+				if (val.booleanValue()) {
+					properties.noOcclusion();
+				}
+			}, () -> properties.noOcclusion());
+		GeneratorBlock generator = new GeneratorBlock(properties);
 		JsonParser.begin(obj)
 		.ifKey("produced_item",
 				val -> generator.producedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(val.string())))
@@ -64,7 +79,8 @@ public class GeneratorBlockParser {
 		.ifKey("ticks_per_operation", val -> generator.ticksPerOperation = val.integer())
 		.ifKey("keep_inventory", val -> generator.keepInventory = val.booleanValue())
 		.ifKey("fe_info", val -> generator.feInfo = GSON.fromJson(val.jsonElement(), FEInfo.class))
-		.ifKey("block_item", val -> generator.blockItemInfo = GSON.fromJson(val.jsonElement(), BlockItemInfo.class));
+		.ifKey("block_item", val -> generator.blockItemInfo = GSON.fromJson(val.jsonElement(), BlockItemInfo.class))
+		.ifKey("propagates_sky_light", val -> generator.propagatesSkyLight = val.booleanValue());
 		//@formatter:on
 		return generator;
 	}

@@ -62,8 +62,10 @@ public class URGGeneratorsReloadListener extends JsonReloadListener {
 	@Override
 	protected void apply(Map<ResourceLocation, JsonElement> pObject, IResourceManager pResourceManager,
 			IProfiler pProfiler) {
-		generators.clear();
-		pObject.forEach((rl, json) -> generators.put(rl, GeneratorBlockParser.generatorFromJson((JsonObject) json)));
+		if (!registered) {
+			pObject.forEach(
+					(rl, json) -> generators.put(rl, GeneratorBlockParser.generatorFromJson((JsonObject) json)));
+		}
 	}
 
 	public void forEachGenerator(BiConsumer<? super ResourceLocation, ? super GeneratorBlock> consumer) {

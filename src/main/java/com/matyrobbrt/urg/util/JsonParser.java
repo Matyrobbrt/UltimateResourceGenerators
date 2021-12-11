@@ -47,9 +47,15 @@ public class JsonParser {
 		return new JsonParser(json);
 	}
 
-	public JsonParser ifKey(String value, Consumer<Any> consumer) {
+	public JsonParser ifKey(String value, Consumer<Any> ifPresent) {
+		return ifKey(value, ifPresent, () -> {});
+	}
+
+	public JsonParser ifKey(String value, Consumer<Any> ifPresent, Runnable orElse) {
 		if (json.has(value)) {
-			consumer.accept(new Any(json.get(value)));
+			ifPresent.accept(new Any(json.get(value)));
+		} else {
+			orElse.run();
 		}
 		return this;
 	}

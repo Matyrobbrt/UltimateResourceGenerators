@@ -69,6 +69,8 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 
 	BlockItemInfo blockItemInfo = new BlockItemInfo();
 
+	boolean propagatesSkyLight = true;
+
 	public void copy(GeneratorBlock other) {
 		producedItem = other.producedItem;
 		producedPerOperation = other.producedPerOperation;
@@ -135,6 +137,15 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 				+ producedItem.getName(new ItemStack(producedItem, producedPerOperation)).getString() + " x"
 				+ producedPerOperation + ColourCodes.WHITE + " once every " + ticksPerOperation + " ticks"));
 	}
+
+	@Override
+	public boolean propagatesSkylightDown(BlockState pState, IBlockReader pReader, BlockPos pPos) {
+		return propagatesSkyLight;
+	}
+
+	public Item getProducedItem() { return producedItem; }
+
+	public int getProducedPerOperation() { return producedPerOperation; }
 
 	@Override
 	public ITOPDriver getTheOneProbeDriver() { return new GeneratorTOPDriver(this); }

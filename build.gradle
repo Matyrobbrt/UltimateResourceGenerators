@@ -133,6 +133,9 @@ repositories {
 	   	url "http://maven.tterrag.com/"
 	   	allowInsecureProtocol = true
 	}
+	maven {
+		url "https://www.cursemaven.com"
+	}
 }
 
 dependencies {
@@ -143,6 +146,8 @@ dependencies {
 	implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}") {
     	transitive = false
     })
+    
+    runtimeOnly fg.deobf("curse.maven:usrg-307693:3188219")
     
     annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 }

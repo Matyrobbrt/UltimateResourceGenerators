@@ -39,6 +39,7 @@ import com.matyrobbrt.lib.annotation.RL;
 import com.matyrobbrt.lib.module.IModule;
 import com.matyrobbrt.lib.module.Module;
 import com.matyrobbrt.urg.UltimateResourceGenerators;
+import com.matyrobbrt.urg.client.DefaultGeneratorTER;
 import com.matyrobbrt.urg.packs.URGGeneratorsReloadListener;
 
 import net.minecraft.block.Block;
@@ -49,8 +50,10 @@ import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Module(id = @RL(modid = UltimateResourceGenerators.MOD_ID, path = "generator"))
 @Mod.EventBusSubscriber(bus = Bus.MOD, modid = UltimateResourceGenerators.MOD_ID)
@@ -95,6 +98,11 @@ public class GeneratorModule implements IModule {
 
 		event.getRegistry().register(GENERATOR_TILE_ENTITY_TYPE
 				.setRegistryName(new ResourceLocation(UltimateResourceGenerators.MOD_ID, "resource_generator")));
+	}
+
+	@Override
+	public void onClientSetup(FMLClientSetupEvent event) {
+		ClientRegistry.bindTileEntityRenderer(GENERATOR_TILE_ENTITY_TYPE, DefaultGeneratorTER::new);
 	}
 
 }

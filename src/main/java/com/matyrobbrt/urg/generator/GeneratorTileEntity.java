@@ -72,7 +72,7 @@ public class GeneratorTileEntity extends BaseTileEntity implements ITickableTile
 		@Override
 		protected void onContentsChanged(int slot) {
 			super.onContentsChanged(slot);
-			sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction.SERVER_TO_CLIENT);
+			// sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction.SERVER_TO_CLIENT);
 		}
 	};
 
@@ -94,7 +94,7 @@ public class GeneratorTileEntity extends BaseTileEntity implements ITickableTile
 			@Override
 			public void setChanged() {
 				super.setChanged();
-				sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction.SERVER_TO_CLIENT);
+				// sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction.SERVER_TO_CLIENT);
 			}
 		};
 	}
@@ -148,14 +148,14 @@ public class GeneratorTileEntity extends BaseTileEntity implements ITickableTile
 		if (nbt.contains("ownerBlock")) {
 			generatorBlock = ForgeRegistries.BLOCKS
 					.getValue(new ResourceLocation(nbt.getString("ownerBlock"))) instanceof GeneratorBlock
-					? (GeneratorBlock) ForgeRegistries.BLOCKS
-							.getValue(new ResourceLocation(nbt.getString("ownerBlock")))
+							? (GeneratorBlock) ForgeRegistries.BLOCKS
+									.getValue(new ResourceLocation(nbt.getString("ownerBlock")))
 							: null;
 		}
 		if (nbt.contains("ticksSinceLastProduction")) {
 			ticksSinceLastProduction = nbt.getInt("ticksSinceLastProduction");
 		}
-		if (nbt.contains("inventory") && generatorBlock.keepInventory) {
+		if (nbt.contains("inventory") && (generatorBlock == null || generatorBlock.keepInventory)) {
 			inventory.deserializeNBT(nbt.getCompound("inventory"));
 		}
 		if (nbt.contains("alreadyProduced")) {
