@@ -1,0 +1,18 @@
+{
+	"required": true,
+	"package": "com.matyrobbrt.urg.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"refmap": "machina.refmap.json",
+	"mixins": [
+		"ResourcePackLoaderMixin"
+	],
+	"server": [
+		"ServerMainMixin"
+	],
+	"client": [
+		"MinecraftMixin",
+		"CreateWorldScreenMixin",
+		"WorldOptionsScreenMixin"
+	],
+	"minVersion": "0.8"
+}
