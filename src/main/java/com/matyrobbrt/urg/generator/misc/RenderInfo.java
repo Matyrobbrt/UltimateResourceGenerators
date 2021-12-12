@@ -38,7 +38,7 @@ public class RenderInfo {
 
 	@Expose
 	public double[] translation = {
-			0.5d, 0.3d, 0.5d
+			0.5d, 0.4d, 0.5d
 	};
 
 	@Expose

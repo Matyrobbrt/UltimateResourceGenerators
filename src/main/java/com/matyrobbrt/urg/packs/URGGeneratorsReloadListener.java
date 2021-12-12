@@ -36,20 +36,21 @@ import java.util.stream.Stream;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.matyrobbrt.urg.UltimateResourceGenerators;
 import com.matyrobbrt.urg.generator.GeneratorBlock;
 import com.matyrobbrt.urg.generator.GeneratorBlockParser;
+import com.matyrobbrt.urg.generator.misc.GeneratorInfo;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
-import net.minecraftforge.registries.ForgeRegistries;
-
 public class URGGeneratorsReloadListener extends JsonReloadListener {
 
 	public static URGGeneratorsReloadListener INSTANCE = new URGGeneratorsReloadListener();
+
+	public Map<ResourceLocation, GeneratorInfo> generatorInfos = new HashMap<>();
 
 	public URGGeneratorsReloadListener() {
 		super((new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create(), "urg_generators");
@@ -62,19 +63,21 @@ public class URGGeneratorsReloadListener extends JsonReloadListener {
 	@Override
 	protected void apply(Map<ResourceLocation, JsonElement> pObject, IResourceManager pResourceManager,
 			IProfiler pProfiler) {
-		pObject.forEach((rl, json) -> generators.put(rl, GeneratorBlockParser.generatorFromJson((JsonObject) json)));
-		if (registered) {
-			update();
+		update(pObject);
+		if (!registered) {
+			pObject.forEach(
+					(rl, json) -> generators.put(rl, GeneratorBlockParser.generatorFromJson((JsonObject) json, rl)));
 		}
 	}
 
-	public void update() {
-		generators.forEach((rl, generator) -> {
-			Block block = ForgeRegistries.BLOCKS.getValue(rl);
-			if (block instanceof GeneratorBlock) {
-				((GeneratorBlock) block).copy(generator);
-			}
-		});
+	public void update(Map<ResourceLocation, JsonElement> objects) {
+		UltimateResourceGenerators.LOGGER.info("Started updating generators information...");
+		objects.forEach((rl, obj) -> generatorInfos.put(rl, GeneratorBlockParser.infoFromJson((JsonObject) obj)));
+		UltimateResourceGenerators.LOGGER.info("Done updating generators information!");
+	}
+
+	public GeneratorInfo getInfoForRL(ResourceLocation rl) {
+		return generatorInfos.computeIfAbsent(rl, newRL -> new GeneratorInfo());
 	}
 
 	public void forEachGenerator(BiConsumer<? super ResourceLocation, ? super GeneratorBlock> consumer) {

@@ -162,7 +162,9 @@ public class UltimateResourceGenerators extends ModSetup {
 
 		public URGClientSetup(IEventBus modBus) {
 			super(modBus);
-			Minecraft.getInstance().getResourcePackRepository().addPackFinder(URGPackFinder.FINDER);
+			if (Minecraft.getInstance() != null) {
+				Minecraft.getInstance().getResourcePackRepository().addPackFinder(URGPackFinder.FINDER);
+			}
 		}
 
 	}

@@ -27,34 +27,29 @@
 
 package com.matyrobbrt.urg.generator;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.matyrobbrt.urg.generator.misc.BlockItemInfo;
-import com.matyrobbrt.urg.generator.misc.FEInfo;
-import com.matyrobbrt.urg.generator.misc.RenderInfo;
-import com.matyrobbrt.urg.registries.URGRegistries;
-import com.matyrobbrt.urg.util.JsonParser;
+import com.matyrobbrt.urg.generator.misc.GeneratorInfo;
+import com.matyrobbrt.urg.packs.URGGeneratorsReloadListener;
 
 import net.minecraft.block.AbstractBlock.Properties;
-import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
-
-import net.minecraftforge.common.ToolType;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class GeneratorBlockParser {
 
 	public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
-	public static GeneratorBlock generatorFromJson(JsonObject obj) {
-		AtomicReference<Material> material = new AtomicReference<>(Material.HEAVY_METAL);
-		JsonParser.begin(obj.has("block_properties") ? obj.getAsJsonObject("block_properties") : new JsonObject())
-				.ifKey("material",
-						val -> material.set(URGRegistries.BLOCK_MATERIALS.get(new ResourceLocation(val.string()))));
-		Properties properties = Properties.of(material.get());
+	public static GeneratorBlock generatorFromJson(JsonObject obj, ResourceLocation infoLocation) {
+		GeneratorInfo info = URGGeneratorsReloadListener.INSTANCE.getInfoForRL(infoLocation);
+		Properties properties = Properties.of(info.blockProperties.getMaterial());
+		info.blockProperties.applyProperties(properties);
+		GeneratorBlock generator = new GeneratorBlock(properties);
+		generator.infoLocation = infoLocation;
+
+		return generator;
+
+		/*
 		//@formatter:off
 		JsonParser.begin(obj.has("block_properties") ? obj.getAsJsonObject("block_properties") : new JsonObject())
 			.ifKey("strength", val -> properties.strength(val.floatValue()))
@@ -71,7 +66,11 @@ public class GeneratorBlockParser {
 				}
 			}, properties::noOcclusion)
 			.ifKey("light_level", val -> properties.lightLevel(state -> val.integerValue()));
-		GeneratorBlock generator = new GeneratorBlock(properties);
+		//@formatter:on
+		*/
+
+		//@formatter:off
+		/*
 		JsonParser.begin(obj)
 		.ifKey("produced_item",
 				val -> generator.producedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(val.string())))
@@ -90,9 +89,17 @@ public class GeneratorBlockParser {
 		.ifKey("block_item", val -> generator.blockItemInfo = GSON.fromJson(val.jsonElement(), BlockItemInfo.class))
 		.ifKey("propagates_sky_light", val -> generator.propagatesSkyLight = val.booleanValue())
 		.ifKey("tile_entity_renderer", val -> generator.tileRenderInfo = GSON.fromJson(val.jsonElement(), RenderInfo.class))
-		.ifKey("render_types", val -> generator.renderType = URGRegistries.RENDER_TYPES.get(new ResourceLocation(val.string())));
+		.ifKey("render_type", val -> generator.renderType = URGRegistries.RENDER_TYPES.get(new ResourceLocation(val.string())));
+		*/
 		//@formatter:on
-		return generator;
+	}
+
+	public static GeneratorInfo infoFromJson(JsonObject obj) {
+		GeneratorInfo info = GSON.fromJson(obj, GeneratorInfo.class);
+		if (info.producedPerOperation > 64) {
+			info.producedPerOperation = 64;
+		}
+		return info;
 	}
 
 }

@@ -72,7 +72,7 @@ minecraft {
         }
 
         data {
-            workingDirectory project.file('run/data')
+            workingDirectory project.file('run/client')
             arg "-mixin.config=urg.mixins.json"
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
@@ -132,8 +132,8 @@ task makeChangelog(type: GitChangelogTask) {
 	fromRepo = file("$projectDir")
 	file = file('changelog.html')
 	untaggedName = "Current release ${version}"
-	fromCommit = '365ddc5a77ed5ec2f14b1bdb89df1577a27f75f2'
-	toRef = 'main'
+	fromCommit = "${changelog_commit_start}"
+	toRef = '1.16.5'
 	templateContent = file('changelog.mustache').getText('UTF-8')
 }
 
