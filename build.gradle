@@ -132,7 +132,7 @@ task makeChangelog(type: GitChangelogTask) {
 	fromRepo = file("$projectDir")
 	file = file('changelog.html')
 	untaggedName = "Current release ${version}"
-	fromCommit = '503bf04ee75f5995929b9c8e847921b64e95a07c'
+	fromCommit = '365ddc5a77ed5ec2f14b1bdb89df1577a27f75f2'
 	toRef = 'main'
 	templateContent = file('changelog.mustache').getText('UTF-8')
 }
@@ -201,6 +201,7 @@ jar {
             "MixinConfigs": "urg.mixins.json"
         ])
     }
+    destinationDirectory = file("$rootDir/build-out/${mc_version}/")
 }
 
 jar.finalizedBy('reobfJar') 

@@ -44,7 +44,6 @@ import com.matyrobbrt.lib.annotation.SyncValue;
 import com.matyrobbrt.lib.registry.annotation.AnnotationProcessor;
 import com.matyrobbrt.lib.registry.annotation.RegisterItem;
 import com.matyrobbrt.lib.registry.annotation.RegistryHolder;
-import com.matyrobbrt.lib.util.extender.CustomPackTypes;
 import com.matyrobbrt.urg.generator.GeneratorTileEntity.ItemHandler;
 import com.matyrobbrt.urg.generator.misc.URGEnergyStorage;
 import com.matyrobbrt.urg.network.URGNetwork;
@@ -60,7 +59,6 @@ import net.minecraft.crash.ReportedException;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.resources.ResourcePackType;
 import net.minecraft.util.Util;
 
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -75,8 +73,6 @@ import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 @RegistryHolder(modid = UltimateResourceGenerators.MOD_ID)
 @Mod(value = UltimateResourceGenerators.MOD_ID)
 public class UltimateResourceGenerators extends ModSetup {
-
-	public static final ResourcePackType PACK_TYPE = CustomPackTypes.create("URG", "urg");
 
 	public static final Logger LOGGER = LogManager.getLogger();
 
