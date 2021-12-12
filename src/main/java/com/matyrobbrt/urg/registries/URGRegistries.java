@@ -71,7 +71,8 @@ public class URGRegistries {
 
 		register(RENDER_TYPES, "translucent", RenderType.translucent());
 		register(RENDER_TYPES, "translucent_moving_block", RenderType.translucentMovingBlock());
-		register(RENDER_TYPES, "translucent_no_crumbling", RenderType.translucentNoCrumbling());
+		// register(RENDER_TYPES, "translucent_no_crumbling",
+		// RenderType.translucentNoCrumbling());
 
 		register(RENDER_TYPES, "leash", RenderType.leash());
 		register(RENDER_TYPES, "water_mask", RenderType.waterMask());

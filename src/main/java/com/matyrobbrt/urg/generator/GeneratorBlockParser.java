@@ -33,6 +33,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.matyrobbrt.urg.generator.misc.BlockItemInfo;
+import com.matyrobbrt.urg.generator.misc.FEInfo;
 import com.matyrobbrt.urg.generator.misc.RenderInfo;
 import com.matyrobbrt.urg.registries.URGRegistries;
 import com.matyrobbrt.urg.util.JsonParser;
@@ -68,7 +69,8 @@ public class GeneratorBlockParser {
 				if (val.booleanValue()) {
 					properties.noOcclusion();
 				}
-			}, properties::noOcclusion);
+			}, properties::noOcclusion)
+			.ifKey("light_level", val -> properties.lightLevel(state -> val.integerValue()));
 		GeneratorBlock generator = new GeneratorBlock(properties);
 		JsonParser.begin(obj)
 		.ifKey("produced_item",
@@ -84,8 +86,7 @@ public class GeneratorBlockParser {
 		.ifKey("ticks_per_operation", val -> generator.ticksPerOperation = val.integerValue())
 		.ifKey("keep_inventory", val -> generator.keepInventory = val.booleanValue())
 		.ifKey("auto_output", val -> generator.autoOutput = val.booleanValue())
-		//TODO: figure out why the energy mode doesnt fully work 
-		//.ifKey("fe_info", val -> generator.feInfo = GSON.fromJson(val.jsonElement(), FEInfo.class))
+		.ifKey("fe_info", val -> generator.feInfo = GSON.fromJson(val.jsonElement(), FEInfo.class))
 		.ifKey("block_item", val -> generator.blockItemInfo = GSON.fromJson(val.jsonElement(), BlockItemInfo.class))
 		.ifKey("propagates_sky_light", val -> generator.propagatesSkyLight = val.booleanValue())
 		.ifKey("tile_entity_renderer", val -> generator.tileRenderInfo = GSON.fromJson(val.jsonElement(), RenderInfo.class))

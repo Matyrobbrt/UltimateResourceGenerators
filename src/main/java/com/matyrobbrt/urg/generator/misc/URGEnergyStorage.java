@@ -63,6 +63,11 @@ public class URGEnergyStorage extends EnergyStorage {
 		return toReturn;
 	}
 
+	public void extractEnergyInternal(int amount) {
+		energy -= amount;
+		setChanged();
+	}
+
 	public static URGEnergyStorage fromNbt(CompoundNBT nbt) {
 		return new URGEnergyStorage(nbt.getInt("capacity"), nbt.getInt("maxReceive"), nbt.getInt("maxExtract"),
 				nbt.getInt("energy"));

@@ -28,10 +28,8 @@
 package com.matyrobbrt.urg.generator;
 
 import com.matyrobbrt.lib.annotation.SyncValue;
-import com.matyrobbrt.lib.tile_entity.BaseTileEntity;
 import com.matyrobbrt.urg.generator.misc.FEInfo;
 import com.matyrobbrt.urg.generator.misc.URGEnergyStorage;
-import com.matyrobbrt.urg.network.URGSyncValuesMessage;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
@@ -52,7 +50,16 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class GeneratorTileEntity extends BaseTileEntity implements ITickableTileEntity {
+/**
+ * Sync values not working yet, some weird thing with BaseTileEntity i need to
+ * fix
+ *
+ */
+
+/**
+ * @author matyrobbrt
+ */
+public class GeneratorTileEntity extends TileEntity implements ITickableTileEntity {
 
 	private Item producedItem;
 	private int producedPerOperation = 1;
@@ -72,11 +79,11 @@ public class GeneratorTileEntity extends BaseTileEntity implements ITickableTile
 		protected void onContentsChanged(int slot) {
 			super.onContentsChanged(slot);
 			GeneratorTileEntity.this.setChanged();
-			sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction.SERVER_TO_CLIENT);
+			// sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction.SERVER_TO_CLIENT);
 		}
 	};
 
-	@SyncValue(name = "energy", onPacket = true)
+	@SyncValue(name = "energySync", onPacket = true)
 	public URGEnergyStorage energyStorage = createEnergyStorage();
 
 	public GeneratorBlock generatorBlock;
@@ -191,7 +198,7 @@ public class GeneratorTileEntity extends BaseTileEntity implements ITickableTile
 		} else {
 			if (feInfo.usesFE) {
 				if (energyStorage.getEnergyStored() >= feInfo.feUsedPerTick) {
-					energyStorage.extractEnergy(feInfo.feUsedPerTick, false);
+					energyStorage.extractEnergyInternal(feInfo.feUsedPerTick);
 					ticksSinceLastProduction++;
 				}
 			} else {
@@ -230,10 +237,11 @@ public class GeneratorTileEntity extends BaseTileEntity implements ITickableTile
 		return generatorBlock == null || generatorBlock.autoOutput;
 	}
 
-	@Override
-	public void sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction direction) {
-		URGSyncValuesMessage.send(this);
-	}
+	/*
+	 * @Override public void
+	 * sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction
+	 * direction) { URGSyncValuesMessage.send(this); }
+	 */
 
 	public static class ItemHandler extends ItemStackHandler {
 
