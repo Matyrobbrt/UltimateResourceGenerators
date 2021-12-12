@@ -43,7 +43,7 @@ public class URGGeneratorProvider implements IDataProvider {
 	}
 
 	private void generateGenerators(DirectoryCache cache) {
-		Path outputFolder = Paths.get(FMLPaths.GAMEDIR.get().resolve("urg_packs").toFile().getPath());
+		Path outputFolder = Paths.get(FMLPaths.GAMEDIR.get().resolve("../../dev_urg_packs").toFile().getPath());
 		generatorInfo.forEach((rl, info) -> {
 			Path path = outputFolder
 					.resolve(packName + "/data/" + rl.getNamespace() + "/urg_generators/" + rl.getPath() + ".json");

@@ -37,6 +37,8 @@ import net.minecraft.resources.ResourcePackType;
 import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.Unit;
 
+import net.minecraftforge.fml.loading.FMLEnvironment;
+
 public class URGResourceManager {
 
 	private static URGResourceManager instance = new URGResourceManager();
@@ -53,6 +55,9 @@ public class URGResourceManager {
 		resourceManager = new SimpleReloadableResourceManager(ResourcePackType.SERVER_DATA);
 		packFinder = URGPackFinder.FINDER;
 		packList = new ResourcePackList(packFinder);
+		if (!FMLEnvironment.production) {
+			addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
+		}
 	}
 
 	public IPackFinder getWrappedPackFinder() {

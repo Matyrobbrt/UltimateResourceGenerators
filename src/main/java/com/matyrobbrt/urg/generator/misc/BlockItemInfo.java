@@ -43,7 +43,7 @@ public class BlockItemInfo {
 	 */
 	@Deprecated
 	@Expose
-	public String rarity = "common";
+	public String rarity = "COMMON";
 
 	public Rarity getRarity() { return Rarity.valueOf(rarity) != null ? Rarity.valueOf(rarity) : Rarity.COMMON; }
 

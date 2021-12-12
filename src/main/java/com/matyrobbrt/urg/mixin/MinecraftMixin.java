@@ -38,6 +38,8 @@ import net.minecraft.resources.IPackFinder;
 import net.minecraft.resources.ResourcePackInfo;
 import net.minecraft.resources.ResourcePackList;
 
+import net.minecraftforge.fml.loading.FMLEnvironment;
+
 @Mixin(Minecraft.class)
 public class MinecraftMixin {
 
@@ -45,6 +47,9 @@ public class MinecraftMixin {
 	public ResourcePackList redirectClientPackListCreation(ResourcePackInfo.IFactory factory, IPackFinder... finders) {
 		ResourcePackList list = new ResourcePackList(factory, finders);
 		list.addPackFinder(URGPackFinder.FINDER);
+		if (!FMLEnvironment.production) {
+			list.addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
+		}
 		return list;
 	}
 
@@ -52,6 +57,9 @@ public class MinecraftMixin {
 	public ResourcePackList redirectPackListCreation(IPackFinder... finders) {
 		ResourcePackList list = new ResourcePackList(finders);
 		list.addPackFinder(URGPackFinder.FINDER);
+		if (!FMLEnvironment.production) {
+			list.addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
+		}
 		return list;
 	}
 

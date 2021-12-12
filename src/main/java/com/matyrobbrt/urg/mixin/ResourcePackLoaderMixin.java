@@ -41,6 +41,7 @@ import com.matyrobbrt.urg.packs.URGPackFinder;
 import net.minecraft.resources.ResourcePackInfo;
 import net.minecraft.resources.ResourcePackList;
 
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.moddiscovery.ModFile;
 import net.minecraftforge.fml.packs.ModFileResourcePack;
 import net.minecraftforge.fml.packs.ResourcePackLoader;
@@ -54,6 +55,9 @@ public class ResourcePackLoaderMixin {
 			BiFunction<Map<ModFile, ? extends ModFileResourcePack>, BiConsumer<? super ModFileResourcePack, ResourcePackInfo>, IPackInfoFinder> packFinder,
 			CallbackInfo callback) {
 		resourcePacks.addPackFinder(URGPackFinder.FINDER);
+		if (!FMLEnvironment.production) {
+			resourcePacks.addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
+		}
 	}
 
 }

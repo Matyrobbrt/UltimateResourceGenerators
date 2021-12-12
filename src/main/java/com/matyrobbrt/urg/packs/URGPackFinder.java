@@ -47,8 +47,10 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 public class URGPackFinder implements IPackFinder {
 
-	public static final URGPackFinder FINDER = new URGPackFinder(
-			FMLPaths.GAMEDIR.get().resolve("urg_packs").toFile());
+	public static final URGPackFinder DEV_ENVIRONMENT = new URGPackFinder(
+			FMLPaths.GAMEDIR.get().resolve("../../dev_urg_packs").toFile());
+
+	public static final URGPackFinder FINDER = new URGPackFinder(FMLPaths.GAMEDIR.get().resolve("urg_packs").toFile());
 
 	private final File loaderDirectory;
 
@@ -73,8 +75,8 @@ public class URGPackFinder implements IPackFinder {
 				final String packName = "urg_packs/" + packCandidate.getName();
 
 				UltimateResourceGenerators.LOGGER.info("Loading {}.", packName);
-				final ResourcePackInfo packInfo = ResourcePackInfo.create(packName, true,
-						getAsPack(packCandidate), factory, ResourcePackInfo.Priority.TOP, IPackNameDecorator.BUILT_IN);
+				final ResourcePackInfo packInfo = ResourcePackInfo.create(packName, true, getAsPack(packCandidate),
+						factory, ResourcePackInfo.Priority.TOP, IPackNameDecorator.BUILT_IN);
 
 				/* Could be null */
 				if (packInfo != null) {

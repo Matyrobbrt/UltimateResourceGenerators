@@ -37,6 +37,8 @@ import net.minecraft.resources.IPackFinder;
 import net.minecraft.resources.ResourcePackList;
 import net.minecraft.server.Main;
 
+import net.minecraftforge.fml.loading.FMLEnvironment;
+
 @Mixin(Main.class)
 public class ServerMainMixin {
 
@@ -44,6 +46,9 @@ public class ServerMainMixin {
 	private static ResourcePackList redirectPackListCreation(IPackFinder... finders) {
 		ResourcePackList list = new ResourcePackList(finders);
 		list.addPackFinder(URGPackFinder.FINDER);
+		if (!FMLEnvironment.production) {
+			list.addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
+		}
 		return list;
 	}
 
