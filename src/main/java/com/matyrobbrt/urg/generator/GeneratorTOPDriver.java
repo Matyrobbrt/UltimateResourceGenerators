@@ -54,26 +54,25 @@ public class GeneratorTOPDriver implements ITOPDriver {
 	public void addProbeInfo(ProbeMode probeMode, IProbeInfo probeInfo, PlayerEntity player, World level,
 			BlockState blockState, IProbeHitData probeData) {
 		GeneratorTileEntity tile = (GeneratorTileEntity) level.getBlockEntity(probeData.getPos());
-		probeInfo.text("Produces " + ColourCodes.LIGHT_PURPLE
-				+ generator.producedItem.getName(new ItemStack(generator.producedItem, generator.producedPerOperation))
-						.getString()
-				+ " x" + generator.producedPerOperation + ColourCodes.WHITE + " once every "
-				+ generator.ticksPerOperation + " ticks");
-		probeInfo.text("Ticks until next production: " + (generator.ticksPerOperation - tile.ticksSinceLastProduction));
-
-		if (generator.maxProduced != -1) {
+		if (probeMode == ProbeMode.EXTENDED) {
+			probeInfo.text("Produces " + ColourCodes.LIGHT_PURPLE
+					+ generator.producedItem
+							.getName(new ItemStack(generator.producedItem, generator.producedPerOperation)).getString()
+					+ " x" + generator.producedPerOperation + ColourCodes.WHITE + " once every "
+					+ generator.ticksPerOperation + " ticks");
 			probeInfo.text(
-					"Can produce " + ColourCodes.GOLD + generator.maxProduced + ColourCodes.WHITE + " total items");
-			probeInfo.text("Items remaining to produce: " + (generator.maxProduced - tile.alreadyProduced));
-		}
+					"Ticks until next production: " + (generator.ticksPerOperation - tile.ticksSinceLastProduction));
 
-		if (generator.feInfo != null && generator.feInfo.uses_forge_energy) {
-			probeInfo.text("Uses " + ColourCodes.DARK_GREEN + generator.feInfo.fe_used_per_tick + "FE"
-					+ ColourCodes.WHITE + " / tick");
-		}
+			if (generator.maxProduced != -1) {
+				probeInfo.text(
+						"Can produce " + ColourCodes.GOLD + generator.maxProduced + ColourCodes.WHITE + " total items");
+				probeInfo.text("Items remaining to produce: " + (generator.maxProduced - tile.alreadyProduced));
+			}
 
-		if (!tile.inventory.getStackInSlot(0).isEmpty()) {
-			probeInfo.item(tile.inventory.getStackInSlot(0));
+			if (generator.feInfo != null && generator.feInfo.usesFE) {
+				probeInfo.text("Uses " + ColourCodes.DARK_GREEN + generator.feInfo.feUsedPerTick + "FE"
+						+ ColourCodes.WHITE + " / tick");
+			}
 		}
 
 	}

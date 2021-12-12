@@ -1,3 +1,5 @@
+import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
+
 buildscript {
     repositories {
         maven { url = 'https://maven.parchmentmc.org' }
@@ -15,6 +17,8 @@ buildscript {
 
 plugins {
 	id 'org.cadixdev.licenser' version '0.6.1'
+	id 'com.matthewprenger.cursegradle' version '1.4.0'
+	id 'se.bjurr.gitchangelog.git-changelog-gradle-plugin' version '1.71.4'
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -23,9 +27,12 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '${version}'
+version = "${version}"
 group = 'com.matyrobbrt.urg'
-archivesBaseName = '${mod_id}-${mc_version}'
+archivesBaseName = "${mod_id}-${mc_version}"
+
+def props = new Properties()
+file(".env").withInputStream { props.load(it) }
 
 mixin {
     add sourceSets.main, "urg.refmap.json"
@@ -121,8 +128,35 @@ processResources {
 	configure { finalizedBy(replaceResources) }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+task makeChangelog(type: GitChangelogTask) {
+	fromRepo = file("$projectDir")
+	file = file('changelog.html')
+	untaggedName = "Current release ${version}"
+	fromCommit = '503bf04ee75f5995929b9c8e847921b64e95a07c'
+	toRef = 'main'
+	templateContent = file('changelog.mustache').getText('UTF-8')
+}
 
+curseforge {
+	apiKey = props.getProperty('CURSEFORGE_KEY')
+	project {
+		id = "${curse_project_id}"
+		changelog = file('changelog.html')
+		changelogType = 'html'
+		releaseType = "${release_type}"
+		addGameVersion "${mc_version}"
+		relations {
+            requiredLibrary 'matylib'
+            optionalLibrary 'the-one-probe'
+        }
+	}
+}
+
+afterEvaluate {
+	tasks.curseforge556554.dependsOn makeChangelog
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
 	maven {
@@ -148,6 +182,7 @@ dependencies {
     })
     
     runtimeOnly fg.deobf("curse.maven:usrg-307693:3188219")
+    runtimeOnly fg.deobf("curse.maven:mekanism-268560:3516428")
     
     annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 }

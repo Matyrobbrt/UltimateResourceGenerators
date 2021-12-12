@@ -45,7 +45,7 @@ public class URGEnergyStorage extends EnergyStorage {
 	}
 
 	public CompoundNBT serialize(CompoundNBT nbt) {
-		nbt.putInt("energy", energy);
+		nbt.putInt("energy", getEnergyStored());
 		nbt.putInt("maxExtract", maxExtract);
 		nbt.putInt("maxReceive", maxReceive);
 		nbt.putInt("capacity", capacity);

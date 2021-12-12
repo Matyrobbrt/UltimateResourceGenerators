@@ -38,6 +38,8 @@ import com.matyrobbrt.lib.compat.top.ITOPInfoProvider;
 import com.matyrobbrt.lib.util.ColourCodes;
 import com.matyrobbrt.urg.generator.misc.BlockItemInfo;
 import com.matyrobbrt.urg.generator.misc.FEInfo;
+import com.matyrobbrt.urg.generator.misc.RenderInfo;
+import com.matyrobbrt.urg.util.Utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -52,6 +54,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
@@ -64,12 +67,15 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 	int ticksPerOperation = 200;
 
 	boolean keepInventory = true;
+	boolean autoOutput = true;
 
 	FEInfo feInfo = defaultFeInfo();
 
 	BlockItemInfo blockItemInfo = new BlockItemInfo();
 
 	boolean propagatesSkyLight = true;
+
+	RenderInfo tileRenderInfo = new RenderInfo();
 
 	public void copy(GeneratorBlock other) {
 		producedItem = other.producedItem;
@@ -78,14 +84,18 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 
 		ticksPerOperation = other.ticksPerOperation;
 		feInfo = other.feInfo;
+		blockItemInfo = other.blockItemInfo;
+		propagatesSkyLight = other.propagatesSkyLight;
+		tileRenderInfo = other.tileRenderInfo;
+		autoOutput = other.autoOutput;
 	}
 
 	public static FEInfo defaultFeInfo() {
 		FEInfo info = new FEInfo();
-		info.uses_forge_energy = false;
-		info.fe_used_per_tick = 0;
-		info.fe_capacity = 0;
-		info.fe_transfer_rate = 0;
+		info.usesFE = false;
+		info.feUsedPerTick = 0;
+		info.feCapacity = 0;
+		info.feTransferRate = 0;
 		return info;
 	}
 
@@ -136,6 +146,20 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 		pTooltip.add(new StringTextComponent("Produces " + ColourCodes.LIGHT_PURPLE
 				+ producedItem.getName(new ItemStack(producedItem, producedPerOperation)).getString() + " x"
 				+ producedPerOperation + ColourCodes.WHITE + " once every " + ticksPerOperation + " ticks"));
+
+		com.matyrobbrt.urg.util.Utils.appendShiftTooltip(pTooltip, Utils.conditionedList(list -> {
+			if (feInfo != null && feInfo.usesFE) {
+				list.add(new StringTextComponent(Utils.fromLang("tooltip.urg.fe_usage", feInfo.feUsedPerTick + "")));
+			}
+			if (maxProduced != -1) {
+				list.add(new StringTextComponent(Utils.fromLang("tooltip.urg.max_produced", maxProduced + "")));
+			} else {
+				list.add(new TranslationTextComponent("tooltip.urg.max_produced.infinite"));
+			}
+			if (autoOutput) {
+				list.add(new TranslationTextComponent("tooltip.urg.auto_output"));
+			}
+		}));
 	}
 
 	@Override
@@ -146,6 +170,8 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 	public Item getProducedItem() { return producedItem; }
 
 	public int getProducedPerOperation() { return producedPerOperation; }
+
+	public RenderInfo getTileRenderInfo() { return tileRenderInfo; }
 
 	@Override
 	public ITOPDriver getTheOneProbeDriver() { return new GeneratorTOPDriver(this); }

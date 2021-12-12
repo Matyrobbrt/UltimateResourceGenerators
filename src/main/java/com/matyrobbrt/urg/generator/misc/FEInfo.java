@@ -31,19 +31,24 @@
 package com.matyrobbrt.urg.generator.misc;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class FEInfo {
 
 	@Expose
-	public boolean uses_forge_energy = false;
+	@SerializedName("uses_forge_energy")
+	public boolean usesFE = false;
 
 	@Expose
-	public int fe_used_per_tick = 30;
+	@SerializedName("fe_used_per_tick")
+	public int feUsedPerTick = 30;
 
 	@Expose
-	public int fe_capacity = 10000;
+	@SerializedName("fe_capacity")
+	public int feCapacity = 10000;
 
 	@Expose
-	public int fe_transfer_rate = 130;
+	@SerializedName("fe_transfer_rate")
+	public int feTransferRate = 130;
 
 }

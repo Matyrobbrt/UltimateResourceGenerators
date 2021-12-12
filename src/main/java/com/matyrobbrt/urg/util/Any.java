@@ -44,8 +44,12 @@ public class Any {
 		return obj.getAsString();
 	}
 
-	public int integer() {
+	public int integerValue() {
 		return obj.getAsInt();
+	}
+
+	public float floatValue() {
+		return obj.getAsFloat();
 	}
 
 	public JsonElement jsonElement() {

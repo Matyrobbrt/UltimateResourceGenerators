@@ -34,12 +34,14 @@ import com.matyrobbrt.lib.annotation.SyncValue;
 import com.matyrobbrt.lib.tile_entity.BaseTileEntity;
 import com.matyrobbrt.urg.generator.misc.FEInfo;
 import com.matyrobbrt.urg.generator.misc.URGEnergyStorage;
+import com.matyrobbrt.urg.network.URGSyncValuesMessage;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 
@@ -72,11 +74,12 @@ public class GeneratorTileEntity extends BaseTileEntity implements ITickableTile
 		@Override
 		protected void onContentsChanged(int slot) {
 			super.onContentsChanged(slot);
-			// sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction.SERVER_TO_CLIENT);
+			GeneratorTileEntity.this.setChanged();
+			sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction.SERVER_TO_CLIENT);
 		}
 	};
 
-	@SyncValue(name = "energySync", onPacket = true)
+	@SyncValue(name = "energy", onPacket = true)
 	public URGEnergyStorage energyStorage = createEnergyStorage();
 
 	public GeneratorBlock generatorBlock;
@@ -89,11 +92,12 @@ public class GeneratorTileEntity extends BaseTileEntity implements ITickableTile
 	}
 
 	private URGEnergyStorage createEnergyStorage() {
-		return new URGEnergyStorage(feInfo.fe_capacity, feInfo.fe_transfer_rate, 0) {
+		return new URGEnergyStorage(feInfo.feCapacity, feInfo.feTransferRate, 0) {
 
 			@Override
 			public void setChanged() {
 				super.setChanged();
+				GeneratorTileEntity.this.setChanged();
 				// sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction.SERVER_TO_CLIENT);
 			}
 		};
@@ -174,10 +178,13 @@ public class GeneratorTileEntity extends BaseTileEntity implements ITickableTile
 	}
 
 	public void serverTick() {
+		handleAutoOutput(Direction.UP);
+
 		if (alreadyProduced >= maxProduced && maxProduced != -1) { return; }
 
 		if (ticksSinceLastProduction >= ticksPerOperation) {
-			int produceCount = Math.min(producedPerOperation, maxProduced - alreadyProduced);
+			int produceCount = Math.min(producedPerOperation,
+					maxProduced != -1 ? maxProduced - alreadyProduced : producedPerOperation);
 			ItemStack toInsert = new ItemStack(producedItem, produceCount);
 			if (inventory.insertInternal(0, toInsert, true) != toInsert) {
 				inventory.insertInternal(0, toInsert, false);
@@ -185,22 +192,50 @@ public class GeneratorTileEntity extends BaseTileEntity implements ITickableTile
 				alreadyProduced += produceCount;
 			}
 		} else {
-			if (feInfo.uses_forge_energy) {
-				if (energyStorage.getEnergyStored() >= feInfo.fe_used_per_tick) {
-					energyStorage.extractEnergy(feInfo.fe_used_per_tick, false);
+			if (feInfo.usesFE) {
+				if (energyStorage.getEnergyStored() >= feInfo.feUsedPerTick) {
+					energyStorage.extractEnergy(feInfo.feUsedPerTick, false);
 					ticksSinceLastProduction++;
 				}
 			} else {
 				ticksSinceLastProduction++;
 			}
 		}
+		setChanged();
+	}
+
+	private void handleAutoOutput(Direction direction) {
+		TileEntity tile = level.getBlockEntity(worldPosition.relative(direction));
+		if (tile != null) {
+			tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())
+					.ifPresent(handler -> {
+						if (inventory.getStackInSlot(0).isEmpty()) { return; }
+						for (int slot = 0; slot < handler.getSlots(); slot++) {
+							if (handler.insertItem(slot, inventory.getStackInSlot(0), true) != inventory
+									.getStackInSlot(0)) {
+								inventory.setStackInSlot(0,
+										handler.insertItem(slot, inventory.getStackInSlot(0), false));
+								setChanged();
+							}
+						}
+					});
+		}
 	}
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) { return itemHandlerOptional.cast(); }
-		if (cap == CapabilityEnergy.ENERGY && feInfo.uses_forge_energy) { return energyOptional.cast(); }
+		if (cap == CapabilityEnergy.ENERGY && feInfo.usesFE) { return energyOptional.cast(); }
 		return super.getCapability(cap, side);
+	}
+
+	public boolean autoOutputs() {
+		return generatorBlock == null || generatorBlock.autoOutput;
+	}
+
+	@Override
+	public void sync(com.matyrobbrt.lib.network.matylib.SyncValuesMessage.Direction direction) {
+		URGSyncValuesMessage.send(this);
 	}
 
 	public static class ItemHandler extends ItemStackHandler {

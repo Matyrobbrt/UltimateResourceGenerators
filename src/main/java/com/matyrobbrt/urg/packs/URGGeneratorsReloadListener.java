@@ -42,10 +42,13 @@ import com.google.gson.JsonObject;
 import com.matyrobbrt.urg.generator.GeneratorBlock;
 import com.matyrobbrt.urg.generator.GeneratorBlockParser;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class URGGeneratorsReloadListener extends JsonReloadListener {
 
@@ -62,10 +65,19 @@ public class URGGeneratorsReloadListener extends JsonReloadListener {
 	@Override
 	protected void apply(Map<ResourceLocation, JsonElement> pObject, IResourceManager pResourceManager,
 			IProfiler pProfiler) {
-		if (!registered) {
-			pObject.forEach(
-					(rl, json) -> generators.put(rl, GeneratorBlockParser.generatorFromJson((JsonObject) json)));
+		pObject.forEach((rl, json) -> generators.put(rl, GeneratorBlockParser.generatorFromJson((JsonObject) json)));
+		if (registered) {
+			update();
 		}
+	}
+
+	public void update() {
+		generators.forEach((rl, generator) -> {
+			Block block = ForgeRegistries.BLOCKS.getValue(rl);
+			if (block instanceof GeneratorBlock) {
+				((GeneratorBlock) block).copy(generator);
+			}
+		});
 	}
 
 	public void forEachGenerator(BiConsumer<? super ResourceLocation, ? super GeneratorBlock> consumer) {

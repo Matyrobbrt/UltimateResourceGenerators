@@ -47,6 +47,7 @@ import com.matyrobbrt.lib.registry.annotation.RegistryHolder;
 import com.matyrobbrt.lib.util.extender.CustomPackTypes;
 import com.matyrobbrt.urg.generator.GeneratorTileEntity.ItemHandler;
 import com.matyrobbrt.urg.generator.misc.URGEnergyStorage;
+import com.matyrobbrt.urg.network.URGNetwork;
 import com.matyrobbrt.urg.packs.URGGeneratorsReloadListener;
 import com.matyrobbrt.urg.packs.URGPackFinder;
 import com.matyrobbrt.urg.packs.URGResourceManager;
@@ -62,10 +63,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.resources.ResourcePackType;
 import net.minecraft.util.Util;
 
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 
@@ -87,6 +90,7 @@ public class UltimateResourceGenerators extends ModSetup {
 		modBus.addListener(this::newRegistry);
 
 		forgeBus.addListener(this::onServerAboutToStart);
+		forgeBus.addListener(this::addReloadListener);
 
 		URGResourceManager.instance().addResourceReloadListener(URGGeneratorsReloadListener.INSTANCE);
 
@@ -101,6 +105,10 @@ public class UltimateResourceGenerators extends ModSetup {
 
 		SyncValue.Helper.registerSerializer(URGEnergyStorage.class, URGEnergyStorage::fromNbt,
 				(nbt, energy) -> energy.deserialize(nbt));
+	}
+
+	private void addReloadListener(final AddReloadListenerEvent event) {
+		event.addListener(URGGeneratorsReloadListener.INSTANCE);
 	}
 
 	private void onServerAboutToStart(FMLServerAboutToStartEvent event) {
@@ -126,6 +134,11 @@ public class UltimateResourceGenerators extends ModSetup {
 			Throwable pCause = e.getCause();
 			throw new ReportedException(CrashReport.forThrowable(pCause, "Error loading URG packs!"));
 		}
+	}
+
+	@Override
+	public void onCommonSetup(FMLCommonSetupEvent event) {
+		URGNetwork.register();
 	}
 
 	@Override
