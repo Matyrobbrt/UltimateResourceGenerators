@@ -1,6 +1,6 @@
 /**
- * This file is part of the Machina Minecraft (Java Edition) mod and is licensed
- * under the MIT license:
+ * This file is part of the Ultimate Resource Generators Minecraft mod and is
+ * licensed under the MIT license:
  *
  * MIT License
  *
@@ -23,9 +23,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
- * If you want to contribute please join https://discord.com/invite/x9Mj63m4QG.
- * More information can be found on Github: https://github.com/Cy4Shot/MACHINA
  */
 
 package com.matyrobbrt.urg.client;
