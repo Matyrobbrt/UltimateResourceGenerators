@@ -30,11 +30,14 @@
 
 package com.matyrobbrt.urg.generator;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.matyrobbrt.urg.generator.misc.BlockItemInfo;
 import com.matyrobbrt.urg.generator.misc.RenderInfo;
+import com.matyrobbrt.urg.registries.URGRegistries;
 import com.matyrobbrt.urg.util.JsonParser;
 
 import net.minecraft.block.AbstractBlock.Properties;
@@ -49,7 +52,11 @@ public class GeneratorBlockParser {
 	public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
 	public static GeneratorBlock generatorFromJson(JsonObject obj) {
-		Properties properties = Properties.of(Material.HEAVY_METAL);
+		AtomicReference<Material> material = new AtomicReference<>(Material.HEAVY_METAL);
+		JsonParser.begin(obj.has("block_properties") ? obj.getAsJsonObject("block_properties") : new JsonObject())
+				.ifKey("material",
+						val -> material.set(URGRegistries.BLOCK_MATERIALS.get(new ResourceLocation(val.string()))));
+		Properties properties = Properties.of(material.get());
 		//@formatter:off
 		JsonParser.begin(obj.has("block_properties") ? obj.getAsJsonObject("block_properties") : new JsonObject())
 			.ifKey("strength", val -> properties.strength(val.floatValue()))
@@ -84,7 +91,8 @@ public class GeneratorBlockParser {
 		//.ifKey("fe_info", val -> generator.feInfo = GSON.fromJson(val.jsonElement(), FEInfo.class))
 		.ifKey("block_item", val -> generator.blockItemInfo = GSON.fromJson(val.jsonElement(), BlockItemInfo.class))
 		.ifKey("propagates_sky_light", val -> generator.propagatesSkyLight = val.booleanValue())
-		.ifKey("tile_entity_renderer", val -> generator.tileRenderInfo = GSON.fromJson(val.jsonElement(), RenderInfo.class));
+		.ifKey("tile_entity_renderer", val -> generator.tileRenderInfo = GSON.fromJson(val.jsonElement(), RenderInfo.class))
+		.ifKey("render_types", val -> generator.renderType = URGRegistries.RENDER_TYPES.get(new ResourceLocation(val.string())));
 		//@formatter:on
 		return generator;
 	}

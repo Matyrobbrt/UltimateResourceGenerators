@@ -43,13 +43,14 @@ import com.matyrobbrt.urg.util.Utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.loot.LootParameters;
 import net.minecraft.loot.LootContext.Builder;
+import net.minecraft.loot.LootParameters;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -59,6 +60,8 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 public class GeneratorBlock extends Block implements ITOPInfoProvider {
+
+	RenderType renderType = RenderType.cutout();
 
 	Item producedItem = Items.AIR;
 	int producedPerOperation = 1;

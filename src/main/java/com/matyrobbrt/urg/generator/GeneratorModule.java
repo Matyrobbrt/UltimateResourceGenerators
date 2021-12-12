@@ -43,6 +43,7 @@ import com.matyrobbrt.urg.client.DefaultGeneratorTER;
 import com.matyrobbrt.urg.packs.URGGeneratorsReloadListener;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
@@ -103,6 +104,12 @@ public class GeneratorModule implements IModule {
 	@Override
 	public void onClientSetup(FMLClientSetupEvent event) {
 		ClientRegistry.bindTileEntityRenderer(GENERATOR_TILE_ENTITY_TYPE, DefaultGeneratorTER::new);
+
+		URGGeneratorsReloadListener.INSTANCE.forEachGenerator((rl, generator) -> {
+			if (generator.renderType != null) {
+				RenderTypeLookup.setRenderLayer(generator, generator.renderType);
+			}
+		});
 	}
 
 }

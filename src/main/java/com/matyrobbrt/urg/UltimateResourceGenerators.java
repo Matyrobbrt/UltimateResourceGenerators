@@ -52,8 +52,6 @@ import com.matyrobbrt.urg.packs.URGPackFinder;
 import com.matyrobbrt.urg.packs.URGResourceManager;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.ReportedException;
 import net.minecraft.item.Item;
@@ -65,7 +63,6 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
@@ -169,12 +166,6 @@ public class UltimateResourceGenerators extends ModSetup {
 		public URGClientSetup(IEventBus modBus) {
 			super(modBus);
 			Minecraft.getInstance().getResourcePackRepository().addPackFinder(URGPackFinder.FINDER);
-		}
-
-		@Override
-		public void onClientSetup(FMLClientSetupEvent event) {
-			URGGeneratorsReloadListener.INSTANCE.forEachGenerator(
-					(rl, generator) -> RenderTypeLookup.setRenderLayer(generator, RenderType.cutoutMipped()));
 		}
 
 	}
