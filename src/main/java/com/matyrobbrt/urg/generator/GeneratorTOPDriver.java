@@ -52,22 +52,22 @@ public class GeneratorTOPDriver implements ITOPDriver {
 			BlockState blockState, IProbeHitData probeData) {
 		GeneratorTileEntity tile = (GeneratorTileEntity) level.getBlockEntity(probeData.getPos());
 		if (probeMode == ProbeMode.EXTENDED) {
-			probeInfo.text("Produces " + ColourCodes.LIGHT_PURPLE
-					+ generator.producedItem
-							.getName(new ItemStack(generator.producedItem, generator.producedPerOperation)).getString()
-					+ " x" + generator.producedPerOperation + ColourCodes.WHITE + " once every "
-					+ generator.ticksPerOperation + " ticks");
-			probeInfo.text(
-					"Ticks until next production: " + (generator.ticksPerOperation - tile.ticksSinceLastProduction));
+			probeInfo.text("Produces " + ColourCodes.LIGHT_PURPLE + generator.getProducedItem()
+					.getName(new ItemStack(generator.getProducedItem(), generator.getInfo().producedPerOperation))
+					.getString() + " x" + generator.getInfo().producedPerOperation + ColourCodes.WHITE + " once every "
+					+ generator.getInfo().ticksPerOperation + " ticks");
+			probeInfo.text("Ticks until next production: "
+					+ (generator.getInfo().ticksPerOperation - tile.ticksSinceLastProduction));
 
-			if (generator.maxProduced != -1) {
+			if (generator.getInfo().maxProduced != -1) {
+				probeInfo.text("Can produce " + ColourCodes.GOLD + generator.getInfo().maxProduced + ColourCodes.WHITE
+						+ " total items");
 				probeInfo.text(
-						"Can produce " + ColourCodes.GOLD + generator.maxProduced + ColourCodes.WHITE + " total items");
-				probeInfo.text("Items remaining to produce: " + (generator.maxProduced - tile.alreadyProduced));
+						"Items remaining to produce: " + (generator.getInfo().maxProduced - tile.alreadyProduced));
 			}
 
-			if (generator.feInfo != null && generator.feInfo.usesFE) {
-				probeInfo.text("Uses " + ColourCodes.DARK_GREEN + generator.feInfo.feUsedPerTick + "FE"
+			if (generator.getInfo().feInfo != null && generator.getInfo().feInfo.usesFE) {
+				probeInfo.text("Uses " + ColourCodes.DARK_GREEN + generator.getInfo().feInfo.feUsedPerTick + "FE"
 						+ ColourCodes.WHITE + " / tick");
 			}
 		}

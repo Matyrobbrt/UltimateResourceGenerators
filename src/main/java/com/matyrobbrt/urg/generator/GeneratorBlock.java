@@ -33,22 +33,21 @@ import com.google.common.collect.Lists;
 import com.matyrobbrt.lib.compat.top.ITOPDriver;
 import com.matyrobbrt.lib.compat.top.ITOPInfoProvider;
 import com.matyrobbrt.lib.util.ColourCodes;
-import com.matyrobbrt.urg.generator.misc.BlockItemInfo;
-import com.matyrobbrt.urg.generator.misc.FEInfo;
+import com.matyrobbrt.urg.generator.misc.GeneratorInfo;
 import com.matyrobbrt.urg.generator.misc.RenderInfo;
+import com.matyrobbrt.urg.packs.URGGeneratorsReloadListener;
 import com.matyrobbrt.urg.util.Utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.loot.LootContext.Builder;
 import net.minecraft.loot.LootParameters;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -58,45 +57,10 @@ import net.minecraft.world.World;
 
 public class GeneratorBlock extends Block implements ITOPInfoProvider {
 
-	RenderType renderType = RenderType.cutout();
-
-	Item producedItem = Items.AIR;
-	int producedPerOperation = 1;
-	int maxProduced = -1;
-
-	int ticksPerOperation = 200;
-
-	boolean keepInventory = true;
-	boolean autoOutput = true;
-
-	FEInfo feInfo = defaultFeInfo();
-
-	BlockItemInfo blockItemInfo = new BlockItemInfo();
-
-	boolean propagatesSkyLight = true;
-
-	RenderInfo tileRenderInfo = new RenderInfo();
+	ResourceLocation infoLocation;
 
 	public void copy(GeneratorBlock other) {
-		producedItem = other.producedItem;
-		producedPerOperation = other.producedPerOperation;
-		maxProduced = other.maxProduced;
-
-		ticksPerOperation = other.ticksPerOperation;
-		feInfo = other.feInfo;
-		blockItemInfo = other.blockItemInfo;
-		propagatesSkyLight = other.propagatesSkyLight;
-		tileRenderInfo = other.tileRenderInfo;
-		autoOutput = other.autoOutput;
-	}
-
-	public static FEInfo defaultFeInfo() {
-		FEInfo info = new FEInfo();
-		info.usesFE = false;
-		info.feUsedPerTick = 0;
-		info.feCapacity = 0;
-		info.feTransferRate = 0;
-		return info;
+		infoLocation = other.infoLocation;
 	}
 
 	public GeneratorBlock(Properties properties) {
@@ -131,7 +95,7 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 			ItemStack stack = new ItemStack(asItem());
 			generatorTile.saveToNBT(stack.getOrCreateTag());
 			drops.add(stack);
-			if (!keepInventory) {
+			if (!getInfo().keepInventory) {
 				for (int i = 0; i < generatorTile.inventory.getSlots(); i++) {
 					drops.add(generatorTile.inventory.getStackInSlot(i));
 				}
@@ -144,19 +108,23 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 	public void appendHoverText(ItemStack pStack, IBlockReader pLevel, List<ITextComponent> pTooltip,
 			ITooltipFlag pFlag) {
 		pTooltip.add(new StringTextComponent("Produces " + ColourCodes.LIGHT_PURPLE
-				+ producedItem.getName(new ItemStack(producedItem, producedPerOperation)).getString() + " x"
-				+ producedPerOperation + ColourCodes.WHITE + " once every " + ticksPerOperation + " ticks"));
+				+ getInfo().getProducedItem()
+						.getName(new ItemStack(getInfo().getProducedItem(), getInfo().producedPerOperation)).getString()
+				+ " x" + getInfo().producedPerOperation + ColourCodes.WHITE + " once every "
+				+ getInfo().ticksPerOperation + " ticks"));
 
 		com.matyrobbrt.urg.util.Utils.appendShiftTooltip(pTooltip, Utils.conditionedList(list -> {
-			if (feInfo != null && feInfo.usesFE) {
-				list.add(new StringTextComponent(Utils.fromLang("tooltip.urg.fe_usage", feInfo.feUsedPerTick + "")));
+			if (getInfo().feInfo != null && getInfo().feInfo.usesFE) {
+				list.add(new StringTextComponent(
+						Utils.fromLang("tooltip.urg.fe_usage", getInfo().feInfo.feUsedPerTick + "")));
 			}
-			if (maxProduced != -1) {
-				list.add(new StringTextComponent(Utils.fromLang("tooltip.urg.max_produced", maxProduced + "")));
+			if (getInfo().maxProduced != -1) {
+				list.add(new StringTextComponent(
+						Utils.fromLang("tooltip.urg.max_produced", getInfo().maxProduced + "")));
 			} else {
 				list.add(new TranslationTextComponent("tooltip.urg.max_produced.infinite"));
 			}
-			if (autoOutput) {
+			if (getInfo().autoOutput) {
 				list.add(new TranslationTextComponent("tooltip.urg.auto_output"));
 			}
 		}));
@@ -164,14 +132,16 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 
 	@Override
 	public boolean propagatesSkylightDown(BlockState pState, IBlockReader pReader, BlockPos pPos) {
-		return propagatesSkyLight;
+		return getInfo().propagatesSkyLight;
 	}
 
-	public Item getProducedItem() { return producedItem; }
+	public GeneratorInfo getInfo() { return URGGeneratorsReloadListener.INSTANCE.getInfoForRL(infoLocation); }
 
-	public int getProducedPerOperation() { return producedPerOperation; }
+	public Item getProducedItem() { return getInfo().getProducedItem(); }
 
-	public RenderInfo getTileRenderInfo() { return tileRenderInfo; }
+	public int getProducedPerOperation() { return getInfo().producedPerOperation; }
+
+	public RenderInfo getTileRenderInfo() { return getInfo().tileRenderInfo; }
 
 	@Override
 	public ITOPDriver getTheOneProbeDriver() { return new GeneratorTOPDriver(this); }

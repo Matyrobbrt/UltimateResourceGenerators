@@ -70,7 +70,7 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
 	public int alreadyProduced;
 	public int ticksSinceLastProduction;
 
-	private FEInfo feInfo = GeneratorBlock.defaultFeInfo();
+	private FEInfo feInfo = new FEInfo();
 
 	@SyncValue(name = "invSync", onPacket = true)
 	public final ItemHandler inventory = new ItemHandler(1) {
@@ -114,13 +114,13 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
 
 	public void fromBlock(GeneratorBlock block) {
 		if (block == null) { return; }
-		producedItem = block.producedItem;
-		producedPerOperation = block.producedPerOperation;
-		maxProduced = block.maxProduced;
+		producedItem = block.getInfo().getProducedItem();
+		producedPerOperation = block.getInfo().producedPerOperation;
+		maxProduced = block.getInfo().maxProduced;
 
-		ticksPerOperation = block.ticksPerOperation;
-		if (block.feInfo != null) {
-			feInfo = block.feInfo;
+		ticksPerOperation = block.getInfo().ticksPerOperation;
+		if (block.getInfo().feInfo != null) {
+			feInfo = block.getInfo().feInfo;
 		}
 		energyStorage = createEnergyStorage();
 	}
@@ -134,7 +134,7 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
 
 	public void saveToNBT(CompoundNBT nbt) {
 		nbt.putInt("ticksSinceLastProduction", ticksSinceLastProduction);
-		if (generatorBlock == null || generatorBlock.keepInventory) {
+		if (generatorBlock == null || generatorBlock.getInfo().keepInventory) {
 			nbt.put("inventory", inventory.serializeNBT());
 		}
 		nbt.putInt("alreadyProduced", alreadyProduced);
@@ -163,7 +163,7 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
 		if (nbt.contains("ticksSinceLastProduction")) {
 			ticksSinceLastProduction = nbt.getInt("ticksSinceLastProduction");
 		}
-		if (nbt.contains("inventory") && (generatorBlock == null || generatorBlock.keepInventory)) {
+		if (nbt.contains("inventory") && (generatorBlock == null || generatorBlock.getInfo().keepInventory)) {
 			inventory.deserializeNBT(nbt.getCompound("inventory"));
 		}
 		if (nbt.contains("alreadyProduced")) {
@@ -234,7 +234,7 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
 	}
 
 	public boolean autoOutputs() {
-		return generatorBlock == null || generatorBlock.autoOutput;
+		return generatorBlock == null || generatorBlock.getInfo().autoOutput;
 	}
 
 	/*

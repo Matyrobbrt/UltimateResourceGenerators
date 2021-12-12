@@ -37,6 +37,8 @@ import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.resources.IPackFinder;
 import net.minecraft.resources.ResourcePackList;
 
+import net.minecraftforge.fml.loading.FMLEnvironment;
+
 @Mixin(CreateWorldScreen.class)
 public class CreateWorldScreenMixin {
 
@@ -44,6 +46,9 @@ public class CreateWorldScreenMixin {
 	public ResourcePackList redirectPackListCreation(IPackFinder... finders) {
 		ResourcePackList list = new ResourcePackList(finders);
 		list.addPackFinder(URGPackFinder.FINDER);
+		if (!FMLEnvironment.production) {
+			list.addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
+		}
 		return list;
 	}
 

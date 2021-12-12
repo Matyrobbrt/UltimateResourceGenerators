@@ -16,14 +16,12 @@ out
 # gradle
 build
 build-out
+.env
 .gradle
 
 # other
 eclipse
+/classes
 
-# Files from Forge MDK
-forge*changelog.txt
-
+!run/client/
 run/*
-!run/client/urg_packs
-.env

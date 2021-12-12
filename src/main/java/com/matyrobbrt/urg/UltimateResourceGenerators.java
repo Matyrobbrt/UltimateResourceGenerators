@@ -54,6 +54,7 @@ import net.minecraft.crash.ReportedException;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.resources.ResourcePackList;
 import net.minecraft.util.Util;
 
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -63,6 +64,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @RegistryHolder(modid = UltimateResourceGenerators.MOD_ID)
 @Mod(value = UltimateResourceGenerators.MOD_ID)
@@ -103,6 +105,9 @@ public class UltimateResourceGenerators extends ModSetup {
 
 	private void onServerAboutToStart(FMLServerAboutToStartEvent event) {
 		event.getServer().getPackRepository().addPackFinder(URGPackFinder.FINDER);
+		if (!FMLEnvironment.production) {
+			event.getServer().getPackRepository().addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
+		}
 	}
 
 	private static CompletableFuture<URGResourceManager> loaderFuture;
@@ -162,7 +167,13 @@ public class UltimateResourceGenerators extends ModSetup {
 
 		public URGClientSetup(IEventBus modBus) {
 			super(modBus);
-			Minecraft.getInstance().getResourcePackRepository().addPackFinder(URGPackFinder.FINDER);
+			if (Minecraft.getInstance() != null) {
+				ResourcePackList packs = Minecraft.getInstance().getResourcePackRepository();
+				packs.addPackFinder(URGPackFinder.FINDER);
+				if (!FMLEnvironment.production) {
+					packs.addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
+				}
+			}
 		}
 
 	}

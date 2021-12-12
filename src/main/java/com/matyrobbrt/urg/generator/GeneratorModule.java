@@ -82,8 +82,10 @@ public class GeneratorModule implements IModule {
 				"Started Registering URG Generators BlockItems. Errors about unexpected registry domains are harmless...");
 		URGGeneratorsReloadListener.INSTANCE.streamGenerators()
 				.map(entry -> new BlockItem(entry.getValue(),
-						new Item.Properties().tab(UltimateResourceGenerators.URG_TAB)
-								.stacksTo(entry.getValue().blockItemInfo.stack_size)).setRegistryName(entry.getKey()))
+						new Item.Properties().rarity(entry.getValue().getInfo().blockItemInfo.getRarity())
+								.tab(UltimateResourceGenerators.URG_TAB)
+								.stacksTo(entry.getValue().getInfo().blockItemInfo.stackSize))
+										.setRegistryName(entry.getKey()))
 				.forEach(event.getRegistry()::register);
 		LOGGER.info("Done registering URG Generators BlockItems");
 	}
@@ -103,8 +105,8 @@ public class GeneratorModule implements IModule {
 		ClientRegistry.bindTileEntityRenderer(GENERATOR_TILE_ENTITY_TYPE, DefaultGeneratorTER::new);
 
 		URGGeneratorsReloadListener.INSTANCE.forEachGenerator((rl, generator) -> {
-			if (generator.renderType != null) {
-				RenderTypeLookup.setRenderLayer(generator, generator.renderType);
+			if (generator.getInfo().getRenderType() != null) {
+				RenderTypeLookup.setRenderLayer(generator, generator.getInfo().getRenderType());
 			}
 		});
 	}

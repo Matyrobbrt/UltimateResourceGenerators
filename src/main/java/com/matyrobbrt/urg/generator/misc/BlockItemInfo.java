@@ -28,10 +28,23 @@
 package com.matyrobbrt.urg.generator.misc;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import net.minecraft.item.Rarity;
 
 public class BlockItemInfo {
 
 	@Expose
-	public int stack_size = 64;
+	@SerializedName("stack_size")
+	public int stackSize = 64;
+
+	/**
+	 * @deprecated Use {@link #getRarity()}
+	 */
+	@Deprecated
+	@Expose
+	public String rarity = "COMMON";
+
+	public Rarity getRarity() { return Rarity.valueOf(rarity) != null ? Rarity.valueOf(rarity) : Rarity.COMMON; }
 
 }
