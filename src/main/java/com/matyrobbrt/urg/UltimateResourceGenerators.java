@@ -27,20 +27,31 @@
 
 package com.matyrobbrt.urg;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.matyrobbrt.lib.ClientSetup;
+import com.matyrobbrt.lib.MatyLib;
 import com.matyrobbrt.lib.ModSetup;
 import com.matyrobbrt.lib.annotation.SyncValue;
 import com.matyrobbrt.lib.registry.annotation.AnnotationProcessor;
 import com.matyrobbrt.lib.registry.annotation.RegisterItem;
 import com.matyrobbrt.lib.registry.annotation.RegistryHolder;
+import com.matyrobbrt.lib.wrench.DefaultWrenchBehaviours;
+import com.matyrobbrt.lib.wrench.IWrenchBehaviour;
+import com.matyrobbrt.lib.wrench.WrenchIMC;
+import com.matyrobbrt.lib.wrench.WrenchMode;
+import com.matyrobbrt.lib.wrench.WrenchResult;
+import com.matyrobbrt.urg.generator.GeneratorBlock;
 import com.matyrobbrt.urg.generator.GeneratorTileEntity.ItemHandler;
 import com.matyrobbrt.urg.generator.misc.URGEnergyStorage;
 import com.matyrobbrt.urg.network.URGNetwork;
@@ -48,21 +59,30 @@ import com.matyrobbrt.urg.packs.URGGeneratorsReloadListener;
 import com.matyrobbrt.urg.packs.URGPackFinder;
 import com.matyrobbrt.urg.packs.URGResourceManager;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.ReportedException;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
 import net.minecraft.resources.ResourcePackList;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.server.ServerWorld;
 
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
@@ -104,10 +124,7 @@ public class UltimateResourceGenerators extends ModSetup {
 	}
 
 	private void onServerAboutToStart(FMLServerAboutToStartEvent event) {
-		event.getServer().getPackRepository().addPackFinder(URGPackFinder.FINDER);
-		if (!FMLEnvironment.production) {
-			event.getServer().getPackRepository().addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
-		}
+		addPacks(event.getServer().getPackRepository());
 	}
 
 	private static CompletableFuture<URGResourceManager> loaderFuture;
@@ -146,6 +163,40 @@ public class UltimateResourceGenerators extends ModSetup {
 		return Optional.of(() -> new URGClientSetup(modBus));
 	}
 
+	@Override
+	public void onInterModEnqueue(InterModEnqueueEvent event) {
+		InterModComms.sendTo(MatyLib.MOD_ID, WrenchIMC.REGISTER_WRENCH_BEHAVIOUR_METHOD,
+				() -> normalDismantleDep(URGGeneratorsReloadListener.INSTANCE.streamGenerators().map(Entry::getValue)
+						.collect(Collectors.toList()).toArray(new GeneratorBlock[] {})));
+	}
+
+	/**
+	 * Should be in {@link DefaultWrenchBehaviours} in the next MatyLib version
+	 * 
+	 * @deprecated
+	 * @param blocks
+	 * @return
+	 */
+	@Deprecated
+	public static final IWrenchBehaviour normalDismantleDep(Block... blocks) {
+		return (wrench, mode, player, state, pos, level) -> {
+			if ((mode != WrenchMode.DISMANTALE) || !Arrays.asList(blocks).contains(state.getBlock())
+					|| level.isClientSide()) {
+				return WrenchResult.FAIL;
+			}
+			List<ItemStack> drops = state.getDrops(
+					new LootContext.Builder((ServerWorld) level).withParameter(LootParameters.TOOL, ItemStack.EMPTY)
+							.withParameter(LootParameters.BLOCK_ENTITY, level.getBlockEntity(pos))
+							.withParameter(LootParameters.ORIGIN, new Vector3d(pos.getX(), pos.getY(), pos.getZ())));
+			drops.forEach(stack -> {
+				ItemEntity item = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+				level.addFreshEntity(item);
+			});
+			level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+			return WrenchResult.CONSUME;
+		};
+	}
+
 	@RegisterItem("tab_icon")
 	public static final Item TAB_ICON = new Item(new Item.Properties()) {
 
@@ -163,19 +214,26 @@ public class UltimateResourceGenerators extends ModSetup {
 		}
 	};
 
+	public static boolean isProduction() { return true; }
+
 	private static final class URGClientSetup extends ClientSetup {
 
 		public URGClientSetup(IEventBus modBus) {
 			super(modBus);
 			if (Minecraft.getInstance() != null) {
 				ResourcePackList packs = Minecraft.getInstance().getResourcePackRepository();
-				packs.addPackFinder(URGPackFinder.FINDER);
-				if (!FMLEnvironment.production) {
-					packs.addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
-				}
+				addPacks(packs);
 			}
 		}
 
+	}
+
+	public static void addPacks(ResourcePackList packs) {
+		packs.addPackFinder(URGPackFinder.FINDER);
+		if (URGPackFinder.DEV_ENVIRONMENT.getLoaderDirectory() != URGPackFinder.FINDER.getLoaderDirectory()
+				&& !FMLEnvironment.production) {
+			packs.addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
+		}
 	}
 
 }

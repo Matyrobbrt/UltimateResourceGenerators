@@ -43,15 +43,17 @@ import net.minecraft.resources.IResourcePack;
 import net.minecraft.resources.ResourcePackInfo;
 import net.minecraft.resources.ResourcePackInfo.IFactory;
 
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 public class URGPackFinder implements IPackFinder {
 
 	public static final URGPackFinder DEV_ENVIRONMENT = new URGPackFinder(
-			FMLPaths.GAMEDIR.get().resolve("../../dev_urg_packs").toFile());
+			FMLPaths.GAMEDIR.get().resolve(FMLEnvironment.production ? "urg_packs" : "../../dev_urg_packs")
+					.toFile());
 
 	public static final URGPackFinder FINDER = new URGPackFinder(FMLPaths.GAMEDIR.get().resolve("urg_packs").toFile());
-
+	
 	private final File loaderDirectory;
 
 	private URGPackFinder(File loaderDirectory) {
@@ -63,6 +65,8 @@ public class URGPackFinder implements IPackFinder {
 			UltimateResourceGenerators.LOGGER.error("Failed to initialize loader.", e);
 		}
 	}
+
+	public File getLoaderDirectory() { return loaderDirectory; }
 
 	@Override
 	public void loadPacks(Consumer<ResourcePackInfo> packs, IFactory factory) {

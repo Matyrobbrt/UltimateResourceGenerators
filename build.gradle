@@ -219,3 +219,9 @@ publishing {
         }
     }
 }
+
+tasks.register('vanillaPack', Zip) {
+    archiveFileName = "vanilla_urg_pack.zip"
+    destinationDirectory = file("$rootDir/build-out/packs/")
+    from "$rootDir/dev_urg_packs/vanilla_generators"
+}
