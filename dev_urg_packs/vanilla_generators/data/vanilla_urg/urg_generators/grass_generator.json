@@ -10,7 +10,7 @@
     "light_level": 0
   },
   "render_type": "cutout",
-  "produced_item": "minecraft:cobblestone",
+  "produced_item": "minecraft:grass",
   "produced_per_operation": 1,
   "max_produced": -1,
   "ticks_per_operation": 40,

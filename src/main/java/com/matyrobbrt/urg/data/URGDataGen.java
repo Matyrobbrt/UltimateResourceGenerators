@@ -29,19 +29,32 @@ package com.matyrobbrt.urg.data;
 
 import java.util.function.Consumer;
 
+import javax.annotation.Nonnull;
+
+import com.matyrobbrt.lib.datagen.recipe.Output;
+import com.matyrobbrt.lib.datagen.recipe.vanilla.KeyIngredient;
+import com.matyrobbrt.lib.datagen.recipe.vanilla.Pattern;
+import com.matyrobbrt.lib.util.helper.DataGenHelper;
 import com.matyrobbrt.urg.UltimateResourceGenerators;
 import com.matyrobbrt.urg.generator.misc.GeneratorInfo;
 
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.IFinishedRecipe;
+import net.minecraft.data.ShapedRecipeBuilder;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
+@SuppressWarnings("deprecation")
 public class URGDataGen extends URGGeneratorProvider {
 
 	public URGDataGen(DataGenerator gen) {
@@ -50,55 +63,52 @@ public class URGDataGen extends URGGeneratorProvider {
 
 	public static final String VANILLA_GENERATORS = "vanilla_urg";
 
-	@SuppressWarnings("deprecation")
+	public Consumer<IFinishedRecipe> recipeConsumer;
+
 	@Override
 	protected void createInfo() {
-		createVanillaGenerator("cobblestone_generator", info -> {
-			info.producedItem = Items.COBBLESTONE.getRegistryName().toString();
-			info.ticksPerOperation = 100;
-			defaultRender(info);
-		});
-
-		createVanillaGenerator("gravel_generator", info -> {
-			info.producedItem = Items.GRAVEL.getRegistryName().toString();
-			info.ticksPerOperation = 140;
-			defaultRender(info);
-		});
-
-		createVanillaGenerator("sand_generator", info -> {
-			info.producedItem = Items.SAND.getRegistryName().toString();
-			info.ticksPerOperation = 200;
-
-			info.blockProperties.material = "sand";
-			defaultRender(info);
-		});
-
-		createVanillaGenerator("clay_ball_generator", info -> {
-			info.producedItem = Items.CLAY_BALL.getRegistryName().toString();
-			info.ticksPerOperation = 220;
-
-			info.blockProperties.material = "clay";
-			defaultRender(info);
-		});
-
+		createVanillaGenerator(Items.COBBLESTONE);
+		createVanillaGenerator(Items.GRAVEL);
+		createVanillaGenerator(Items.SAND);
 		createVanillaGenerator("diamond_generator", info -> {
 			info.producedItem = registryName(Items.DIAMOND);
-			info.ticksPerOperation = 500;
+			info.ticksPerOperation = 120;
 			info.maxProduced = 350;
 
 			info.blockProperties.harvestLevel = 3;
 			info.blockProperties.strength = 5f;
 			defaultRender(info);
 		});
+		createVanillaGenerator(Items.REDSTONE);
+		createVanillaGenerator(Items.DIRT);
+		createVanillaGenerator(Items.END_STONE);
+		createVanillaGenerator(Items.GRASS);
+		createVanillaGenerator(Items.GLOWSTONE);
+		createVanillaGenerator(Items.CLAY);
+		createVanillaGenerator(Items.MYCELIUM);
+		createVanillaGenerator(Items.NETHERRACK);
+		createVanillaGenerator(Items.OBSIDIAN);
+		createVanillaGenerator(Items.QUARTZ);
+		createVanillaGenerator(Items.SOUL_SAND);
+		createVanillaGenerator(Items.SNOW);
+		createVanillaGenerator(Items.ICE);
+	}
 
-		createVanillaGenerator("redstone_generator", info -> {
-			info.producedItem = registryName(Items.REDSTONE);
-			info.ticksPerOperation = 290;
+	private void createVanillaGenerator(Item item) {
+		createVanillaGenerator(item, info -> {});
+	}
 
-			info.blockProperties.harvestLevel = 2;
-			info.blockProperties.strength = 3f;
+	private void createVanillaGenerator(Item item, Consumer<GeneratorInfo> extraInfo) {
+		createVanillaGenerator(item.getRegistryName().getPath() + "_generator", info -> {
+			info.producedItem = registryName(item);
+			info.ticksPerOperation = 40;
+
+			info.blockProperties.harvestLevel = 1;
+			info.blockProperties.strength = 2f;
+			info.blockProperties.harvestTool = "pickaxe";
 
 			defaultRender(info);
+			extraInfo.accept(info);
 		});
 	}
 
@@ -119,6 +129,67 @@ public class URGDataGen extends URGGeneratorProvider {
 		return new ResourceLocation(VANILLA_GENERATORS, name);
 	}
 
+	private static final class RecipeProvider extends URGRecipeProvider {
+
+		public RecipeProvider(DataGenerator pGenerator) {
+			super(pGenerator, "vanilla_generators");
+		}
+
+		@Override
+		protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
+			normalRecipe(consumer, Items.COBBLESTONE, Tags.Items.COBBLESTONE);
+			normalRecipe(consumer, Items.GRAVEL, Tags.Items.GRAVEL);
+			normalRecipe(consumer, Items.SAND, Tags.Items.SAND);
+			normalRecipe(consumer, Items.DIAMOND, Tags.Items.STORAGE_BLOCKS_DIAMOND);
+			normalRecipe(consumer, Items.REDSTONE, Tags.Items.DUSTS_REDSTONE);
+			normalRecipe(consumer, Items.DIRT);
+			normalRecipe(consumer, Items.GRASS);
+			normalRecipe(consumer, Items.GLOWSTONE);
+			normalRecipe(consumer, Items.CLAY);
+			normalRecipe(consumer, Items.MYCELIUM);
+			normalRecipe(consumer, Items.NETHERRACK, Tags.Items.NETHERRACK);
+			normalRecipe(consumer, Items.OBSIDIAN, Tags.Items.OBSIDIAN);
+			normalRecipe(consumer, Items.QUARTZ, Tags.Items.STORAGE_BLOCKS_QUARTZ);
+			normalRecipe(consumer, Items.SOUL_SAND);
+			normalRecipe(consumer, Items.SNOW);
+			normalRecipe(consumer, Items.ICE);
+		}
+
+		public static void normalRecipe(Consumer<IFinishedRecipe> consumer, Item producedItem) {
+			newShapedRecipe(consumer, new Output(getVPGenerator(producedItem), 1), new Pattern("CCC", "WGL", "CCC"),
+					new KeyIngredient('C', producedItem), new KeyIngredient('W', Items.WATER_BUCKET),
+					new KeyIngredient('G', Tags.Items.GLASS), new KeyIngredient('L', Items.LAVA_BUCKET));
+		}
+
+		public static void normalRecipe(Consumer<IFinishedRecipe> consumer, Item producedItem, ITag<Item> tag) {
+			newShapedRecipe(consumer, new Output(getVPGenerator(producedItem), 1), new Pattern("CCC", "WGL", "CCC"),
+					new KeyIngredient('C', tag), new KeyIngredient('W', Items.WATER_BUCKET),
+					new KeyIngredient('G', Tags.Items.GLASS), new KeyIngredient('L', Items.LAVA_BUCKET));
+		}
+
+		public static void newShapedRecipe(Consumer<IFinishedRecipe> consumer, Output output, Pattern pattern,
+				@Nonnull KeyIngredient... ingredients) {
+			newShapedRecipe(consumer, output, pattern, output.getItem().getRegistryName(), ingredients);
+		}
+
+		public static void newShapedRecipe(Consumer<IFinishedRecipe> consumer, Output output, Pattern pattern,
+				ResourceLocation name, @Nonnull KeyIngredient... ingredients) {
+			ShapedRecipeBuilder recipe = new ShapedRecipeBuilder(output.getItem(), output.getCount());
+			pattern.getShapedRecipePattern(recipe);
+			for (KeyIngredient ingredient : ingredients) {
+				ingredient.defineShapedRecipe(recipe);
+			}
+			recipe.unlockedBy("has_item", DataGenHelper.Criterion.hasAir());
+			recipe.save(consumer, name);
+		}
+
+		public static Item getVPGenerator(Item item) {
+			return ForgeRegistries.ITEMS.getValue(
+					new ResourceLocation(VANILLA_GENERATORS, item.getRegistryName().getPath() + "_generator"));
+		}
+
+	}
+
 	@EventBusSubscriber(bus = Bus.MOD, modid = UltimateResourceGenerators.MOD_ID)
 	public static final class EventHandler {
 
@@ -126,6 +197,7 @@ public class URGDataGen extends URGGeneratorProvider {
 		public static void onDatagen(final GatherDataEvent event) {
 			DataGenerator gen = event.getGenerator();
 			gen.addProvider(new URGDataGen(gen));
+			gen.addProvider(new RecipeProvider(gen));
 		}
 	}
 

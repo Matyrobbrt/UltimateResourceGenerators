@@ -13,7 +13,7 @@
   "produced_item": "minecraft:diamond",
   "produced_per_operation": 1,
   "max_produced": 350,
-  "ticks_per_operation": 500,
+  "ticks_per_operation": 120,
   "keep_inventory": true,
   "auto_output": true,
   "fe_info": {

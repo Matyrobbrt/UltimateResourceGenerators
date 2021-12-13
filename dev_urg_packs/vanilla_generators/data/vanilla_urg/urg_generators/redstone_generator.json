@@ -1,9 +1,9 @@
 {
   "block_properties": {
     "material": "heavy_metal",
-    "strength": 3.0,
+    "strength": 2.0,
     "harvest_tool": "pickaxe",
-    "harvest_level": 2,
+    "harvest_level": 1,
     "requires_correct_tool_for_drops": false,
     "no_occlusion": true,
     "no_collission": false,
@@ -13,7 +13,7 @@
   "produced_item": "minecraft:redstone",
   "produced_per_operation": 1,
   "max_produced": -1,
-  "ticks_per_operation": 290,
+  "ticks_per_operation": 40,
   "keep_inventory": true,
   "auto_output": true,
   "fe_info": {
