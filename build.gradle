@@ -32,7 +32,9 @@ group = 'com.matyrobbrt.urg'
 archivesBaseName = "${mod_id}-${mc_version}"
 
 def props = new Properties()
-file(".env").withInputStream { props.load(it) }
+if (file(".env").exists()) {
+	file(".env").withInputStream { props.load(it) }
+}
 
 mixin {
     add sourceSets.main, "urg.refmap.json"
