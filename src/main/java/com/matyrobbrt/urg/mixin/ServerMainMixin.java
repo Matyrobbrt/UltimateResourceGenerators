@@ -31,13 +31,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import com.matyrobbrt.urg.packs.URGPackFinder;
+import com.matyrobbrt.urg.UltimateResourceGenerators;
 
 import net.minecraft.resources.IPackFinder;
 import net.minecraft.resources.ResourcePackList;
 import net.minecraft.server.Main;
-
-import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mixin(Main.class)
 public class ServerMainMixin {
@@ -45,10 +43,7 @@ public class ServerMainMixin {
 	@Redirect(method = "main([Ljava/lang/String;)V", at = @At(value = "NEW", target = "([Lnet/minecraft/resources/IPackFinder;)Lnet/minecraft/resources/ResourcePackList;"))
 	private static ResourcePackList redirectPackListCreation(IPackFinder... finders) {
 		ResourcePackList list = new ResourcePackList(finders);
-		list.addPackFinder(URGPackFinder.FINDER);
-		if (!FMLEnvironment.production) {
-			list.addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
-		}
+		UltimateResourceGenerators.addPacks(list);
 		return list;
 	}
 

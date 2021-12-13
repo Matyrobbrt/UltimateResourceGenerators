@@ -2,7 +2,7 @@
 	"required": true,
 	"package": "com.matyrobbrt.urg.mixin",
 	"compatibilityLevel": "JAVA_8",
-	"refmap": "machina.refmap.json",
+	"refmap": "urg.refmap.json",
 	"mixins": [
 		"ResourcePackLoaderMixin"
 	],

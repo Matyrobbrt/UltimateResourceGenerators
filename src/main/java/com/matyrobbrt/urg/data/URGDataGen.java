@@ -1,4 +1,33 @@
+/**
+ * This file is part of the Ultimate Resource Generators Minecraft mod and is
+ * licensed under the MIT license:
+ *
+ * MIT License
+ *
+ * Copyright (c) 2021 Matyrobbrt
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.matyrobbrt.urg.data;
+
+import java.util.function.Consumer;
 
 import com.matyrobbrt.urg.UltimateResourceGenerators;
 import com.matyrobbrt.urg.generator.misc.GeneratorInfo;
@@ -24,35 +53,35 @@ public class URGDataGen extends URGGeneratorProvider {
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void createInfo() {
-		generatorInfo.put(vanillaGenerators("cobblestone_generator"), createInfo(info -> {
+		createVanillaGenerator("cobblestone_generator", info -> {
 			info.producedItem = Items.COBBLESTONE.getRegistryName().toString();
 			info.ticksPerOperation = 100;
 			defaultRender(info);
-		}));
+		});
 
-		generatorInfo.put(vanillaGenerators("gravel_generator"), createInfo(info -> {
+		createVanillaGenerator("gravel_generator", info -> {
 			info.producedItem = Items.GRAVEL.getRegistryName().toString();
 			info.ticksPerOperation = 140;
 			defaultRender(info);
-		}));
+		});
 
-		generatorInfo.put(vanillaGenerators("sand_generator"), createInfo(info -> {
+		createVanillaGenerator("sand_generator", info -> {
 			info.producedItem = Items.SAND.getRegistryName().toString();
 			info.ticksPerOperation = 200;
 
 			info.blockProperties.material = "sand";
 			defaultRender(info);
-		}));
+		});
 
-		generatorInfo.put(vanillaGenerators("clay_ball_generator"), createInfo(info -> {
+		createVanillaGenerator("clay_ball_generator", info -> {
 			info.producedItem = Items.CLAY_BALL.getRegistryName().toString();
 			info.ticksPerOperation = 220;
 
 			info.blockProperties.material = "clay";
 			defaultRender(info);
-		}));
+		});
 
-		generatorInfo.put(vanillaGenerators("diamond_generator"), createInfo(info -> {
+		createVanillaGenerator("diamond_generator", info -> {
 			info.producedItem = registryName(Items.DIAMOND);
 			info.ticksPerOperation = 500;
 			info.maxProduced = 350;
@@ -60,7 +89,22 @@ public class URGDataGen extends URGGeneratorProvider {
 			info.blockProperties.harvestLevel = 3;
 			info.blockProperties.strength = 5f;
 			defaultRender(info);
-		}));
+		});
+
+		createVanillaGenerator("redstone_generator", info -> {
+			info.producedItem = registryName(Items.REDSTONE);
+			info.ticksPerOperation = 290;
+
+			info.blockProperties.harvestLevel = 2;
+			info.blockProperties.strength = 3f;
+
+			defaultRender(info);
+		});
+	}
+
+	private void createVanillaGenerator(String name, Consumer<GeneratorInfo> info) {
+		generatorInfo.put(vanillaGenerators(name), createInfo(info));
+		generateModelsGenerators.add(vanillaGenerators(name));
 	}
 
 	private static void defaultRender(GeneratorInfo info) {

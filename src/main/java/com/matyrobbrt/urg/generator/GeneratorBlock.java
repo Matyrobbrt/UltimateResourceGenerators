@@ -33,6 +33,9 @@ import com.google.common.collect.Lists;
 import com.matyrobbrt.lib.compat.top.ITOPDriver;
 import com.matyrobbrt.lib.compat.top.ITOPInfoProvider;
 import com.matyrobbrt.lib.util.ColourCodes;
+import com.matyrobbrt.lib.wrench.DefaultWrenchBehaviours;
+import com.matyrobbrt.lib.wrench.IWrenchBehaviour;
+import com.matyrobbrt.lib.wrench.IWrenchUsable;
 import com.matyrobbrt.urg.generator.misc.GeneratorInfo;
 import com.matyrobbrt.urg.generator.misc.RenderInfo;
 import com.matyrobbrt.urg.packs.URGGeneratorsReloadListener;
@@ -55,7 +58,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-public class GeneratorBlock extends Block implements ITOPInfoProvider {
+public class GeneratorBlock extends Block implements ITOPInfoProvider, IWrenchUsable {
 
 	ResourceLocation infoLocation;
 
@@ -89,7 +92,9 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 	@Override
 	public List<ItemStack> getDrops(BlockState pState, Builder pBuilder) {
 		List<ItemStack> drops = Lists.newArrayList();
-		TileEntity tile = pBuilder.getParameter(LootParameters.BLOCK_ENTITY);
+		TileEntity tile = pBuilder.getOptionalParameter(LootParameters.BLOCK_ENTITY) != null
+				? pBuilder.getParameter(LootParameters.BLOCK_ENTITY)
+				: pBuilder.getLevel().getBlockEntity(new BlockPos(pBuilder.getParameter(LootParameters.ORIGIN)));
 		if (tile instanceof GeneratorTileEntity) {
 			GeneratorTileEntity generatorTile = (GeneratorTileEntity) tile;
 			ItemStack stack = new ItemStack(asItem());
@@ -145,5 +150,8 @@ public class GeneratorBlock extends Block implements ITOPInfoProvider {
 
 	@Override
 	public ITOPDriver getTheOneProbeDriver() { return new GeneratorTOPDriver(this); }
+
+	@Override
+	public IWrenchBehaviour getBehaviour() { return DefaultWrenchBehaviours.normalDismantle(this); }
 
 }

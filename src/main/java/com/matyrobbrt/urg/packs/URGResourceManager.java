@@ -30,6 +30,8 @@ package com.matyrobbrt.urg.packs;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import com.matyrobbrt.lib.util.helper.TernaryHelper;
+
 import net.minecraft.resources.IFutureReloadListener;
 import net.minecraft.resources.IPackFinder;
 import net.minecraft.resources.ResourcePackList;
@@ -48,20 +50,22 @@ public class URGResourceManager {
 	}
 
 	private final SimpleReloadableResourceManager resourceManager;
-	private final URGPackFinder packFinder;
+	private final URGPackFinder mainPackFinder;
 	private final ResourcePackList packList;
 
 	private URGResourceManager() {
 		resourceManager = new SimpleReloadableResourceManager(ResourcePackType.SERVER_DATA);
-		packFinder = URGPackFinder.FINDER;
-		packList = new ResourcePackList(packFinder);
-		if (!FMLEnvironment.production) {
+		mainPackFinder = URGPackFinder.FINDER;
+		packList = new ResourcePackList(mainPackFinder);
+
+		if (URGPackFinder.DEV_ENVIRONMENT.getLoaderDirectory() != URGPackFinder.FINDER.getLoaderDirectory()
+				&& !FMLEnvironment.production) {
 			addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
 		}
 	}
 
 	public IPackFinder getWrappedPackFinder() {
-		return (infoConsumer, infoFactory) -> packFinder.loadPacks(infoConsumer::accept,
+		return (infoConsumer, infoFactory) -> mainPackFinder.loadPacks(infoConsumer::accept,
 				(a, n, b, c, d, e, f) -> infoFactory.create("urg:" + a, true, b, c, d, e, f));
 	}
 
@@ -69,7 +73,14 @@ public class URGResourceManager {
 	 * Call during mod construction **without enqueueWork**!
 	 */
 	public synchronized void addPackFinder(IPackFinder finder) {
-		packList.addPackFinder(finder);
+		if (finder != mainPackFinder && Boolean.TRUE.equals(TernaryHelper.supplier(() -> {
+			if (finder instanceof URGPackFinder) {
+				return ((URGPackFinder) finder).getLoaderDirectory() != mainPackFinder.getLoaderDirectory();
+			}
+			return true;
+		}))) {
+			packList.addPackFinder(finder);
+		}
 	}
 
 	/**

@@ -104,11 +104,15 @@ public class GeneratorModule implements IModule {
 	public void onClientSetup(FMLClientSetupEvent event) {
 		ClientRegistry.bindTileEntityRenderer(GENERATOR_TILE_ENTITY_TYPE, DefaultGeneratorTER::new);
 
-		URGGeneratorsReloadListener.INSTANCE.forEachGenerator((rl, generator) -> {
-			if (generator.getInfo().getRenderType() != null) {
-				RenderTypeLookup.setRenderLayer(generator, generator.getInfo().getRenderType());
-			}
-		});
+		try {
+			URGGeneratorsReloadListener.INSTANCE.forEachGenerator((rl, generator) -> {
+				if (generator.getInfo().getRenderType() != null) {
+					RenderTypeLookup.setRenderLayer(generator, generator.getInfo().getRenderType());
+				}
+			});
+		} catch (IllegalArgumentException e) {
+			LOGGER.info("Caught exception while trying to set render layers!", e);
+		}
 	}
 
 }

@@ -36,12 +36,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.matyrobbrt.urg.packs.URGPackFinder;
+import com.matyrobbrt.urg.UltimateResourceGenerators;
 
 import net.minecraft.resources.ResourcePackInfo;
 import net.minecraft.resources.ResourcePackList;
 
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.moddiscovery.ModFile;
 import net.minecraftforge.fml.packs.ModFileResourcePack;
 import net.minecraftforge.fml.packs.ResourcePackLoader;
@@ -54,10 +53,7 @@ public class ResourcePackLoaderMixin {
 	private static void injectPacks(ResourcePackList resourcePacks,
 			BiFunction<Map<ModFile, ? extends ModFileResourcePack>, BiConsumer<? super ModFileResourcePack, ResourcePackInfo>, IPackInfoFinder> packFinder,
 			CallbackInfo callback) {
-		resourcePacks.addPackFinder(URGPackFinder.FINDER);
-		if (!FMLEnvironment.production) {
-			resourcePacks.addPackFinder(URGPackFinder.DEV_ENVIRONMENT);
-		}
+		UltimateResourceGenerators.addPacks(resourcePacks);
 	}
 
 }

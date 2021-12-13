@@ -29,7 +29,7 @@ A mod that adds custom resource generators. Inspired by USRG, this mod gives mor
 [[dependencies.urg]]
     modId="matylib"
     mandatory=true
-    versionRange="[1.0.4,)"
+    versionRange="[1.0.5,)"
     ordering="NONE"
     side="BOTH"
 
