@@ -32,6 +32,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class FEInfo {
 
+	public static final FEInfo DEFAULT = new FEInfo();
+
 	@Expose
 	@SerializedName("uses_forge_energy")
 	public boolean usesFE = false;

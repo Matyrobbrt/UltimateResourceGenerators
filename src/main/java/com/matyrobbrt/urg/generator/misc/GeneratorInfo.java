@@ -27,8 +27,13 @@
 
 package com.matyrobbrt.urg.generator.misc;
 
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.matyrobbrt.urg.generator.GeneratorBlockParser;
 import com.matyrobbrt.urg.registries.URGRegistries;
 
 import net.minecraft.client.renderer.RenderType;
@@ -37,11 +42,11 @@ import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class GeneratorInfo {
+public class GeneratorInfo implements Cloneable {
 
 	@Expose
 	@SerializedName("block_properties")
-	public BlockProperties blockProperties = new BlockProperties();
+	public BlockProperties blockProperties = BlockProperties.DEFAULT;
 
 	/**
 	 * @deprecated Use {@link #getRenderType()}
@@ -81,11 +86,11 @@ public class GeneratorInfo {
 
 	@Expose
 	@SerializedName("fe_info")
-	public FEInfo feInfo = new FEInfo();
+	public FEInfo feInfo = FEInfo.DEFAULT;
 
 	@Expose
 	@SerializedName("block_item")
-	public BlockItemInfo blockItemInfo = new BlockItemInfo();
+	public BlockItemInfo blockItemInfo = BlockItemInfo.DEFAULT;
 
 	@Expose
 	@SerializedName("propagates_sky_light")
@@ -93,9 +98,63 @@ public class GeneratorInfo {
 
 	@Expose
 	@SerializedName("tile_entity_renderer")
-	public RenderInfo tileRenderInfo = new RenderInfo();
+	public RenderInfo tileRenderInfo = RenderInfo.DEFAULT;
+
+	@Expose
+	@SerializedName("copy_from")
+	public String copyFrom = "";
 
 	public Item getProducedItem() { return ForgeRegistries.ITEMS.getValue(new ResourceLocation(producedItem)); }
 
 	public RenderType getRenderType() { return URGRegistries.RENDER_TYPES.get(new ResourceLocation(renderType)); }
+
+	public static final GeneratorInfo DEFAULT = new GeneratorInfo();
+
+	public GeneratorInfo redirect(GeneratorInfo other) {
+		if (other == null) { return this; }
+		redirectField(ge -> ge.blockProperties, (ge, toSet) -> ge.blockProperties = toSet, other);
+		redirectField(ge -> ge.renderType, (ge, toSet) -> ge.renderType = toSet, other);
+		redirectField(ge -> ge.producedItem, (ge, toSet) -> ge.producedItem = toSet, other);
+		redirectField(ge -> ge.producedPerOperation, (ge, toSet) -> ge.producedPerOperation = toSet, other);
+		redirectField(ge -> ge.maxProduced, (ge, toSet) -> ge.maxProduced = toSet, other);
+		redirectField(ge -> ge.ticksPerOperation, (ge, toSet) -> ge.ticksPerOperation = toSet, other);
+		redirectField(ge -> ge.keepInventory, (ge, toSet) -> ge.keepInventory = toSet, other);
+		redirectField(ge -> ge.autoOutput, (ge, toSet) -> ge.autoOutput = toSet, other);
+		redirectField(ge -> ge.feInfo, (ge, toSet) -> ge.feInfo = toSet, other);
+		redirectField(ge -> ge.blockItemInfo, (ge, toSet) -> ge.blockItemInfo = toSet, other);
+		redirectField(ge -> ge.propagatesSkyLight, (ge, toSet) -> ge.propagatesSkyLight = toSet, other);
+		redirectField(ge -> ge.tileRenderInfo, (ge, toSet) -> ge.tileRenderInfo = toSet, other);
+		redirectField(ge -> ge.copyFrom, (ge, toSet) -> ge.copyFrom = toSet, other);
+		return this;
+	}
+
+	private <T> void redirectField(Function<GeneratorInfo, T> getter, BiConsumer<GeneratorInfo, T> setter,
+			GeneratorInfo other) {
+		T toSet = getter.apply(other);
+		if (toSet != getter.apply(DEFAULT) && toSet != getter.apply(this)) {
+			setter.accept(this, toSet);
+		}
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
+
+	public static final class Redirect {
+
+		private final JsonObject json;
+
+		public Redirect(JsonObject json) {
+			this.json = json;
+		}
+
+		public GeneratorInfo getRedirectFor(ResourceLocation name) {
+			if (json.has(name.toString())) {
+				return GeneratorBlockParser.GSON.fromJson(json.get(name.toString()), GeneratorInfo.class);
+			}
+			return null;
+		}
+
+	}
 }

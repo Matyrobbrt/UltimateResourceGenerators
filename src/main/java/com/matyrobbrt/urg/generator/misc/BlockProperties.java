@@ -39,6 +39,8 @@ import net.minecraftforge.common.ToolType;
 
 public class BlockProperties {
 
+	public static final BlockProperties DEFAULT = new BlockProperties();
+
 	/**
 	 * @deprecated Use {@link #getMaterial()}
 	 */

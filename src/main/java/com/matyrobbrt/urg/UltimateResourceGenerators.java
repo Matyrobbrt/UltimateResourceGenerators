@@ -71,6 +71,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
 import net.minecraft.resources.ResourcePackList;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
@@ -207,6 +208,13 @@ public class UltimateResourceGenerators extends ModSetup {
 	};
 
 	public static final ItemGroup URG_TAB = new ItemGroup(ItemGroup.TABS.length, "urg") {
+
+		@Override
+		public void fillItemList(NonNullList<ItemStack> pItems) {
+			super.fillItemList(pItems);
+			pItems.sort((stack1, stack2) -> stack1.getItem().getRegistryName().getPath()
+					.compareTo(stack2.getItem().getRegistryName().getPath()));
+		}
 
 		@Override
 		public ItemStack makeIcon() {

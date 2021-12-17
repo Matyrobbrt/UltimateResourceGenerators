@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.apache.commons.io.FileUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -80,6 +82,12 @@ public class URGGeneratorProvider implements IDataProvider {
 
 	private void generateGenerators(DirectoryCache cache) {
 		Path outputFolder = Paths.get(FMLPaths.GAMEDIR.get().resolve("../../dev_urg_packs").toFile().getPath());
+
+		try {
+			FileUtils.deleteDirectory(outputFolder.resolve(packName + "/assets").toFile());
+			FileUtils.deleteDirectory(outputFolder.resolve(packName + "/data").toFile());
+		} catch (IOException e1) {}
+
 		generatorInfo.forEach((rl, info) -> {
 			Path generatorPath = outputFolder
 					.resolve(packName + "/data/" + rl.getNamespace() + "/urg_generators/" + rl.getPath() + ".json");
@@ -94,7 +102,6 @@ public class URGGeneratorProvider implements IDataProvider {
 					.resolve(packName + "/assets/" + rl.getNamespace() + "/blockstates/" + rl.getPath() + ".json");
 			Path itemModelPath = outputFolder
 					.resolve(packName + "/assets/" + rl.getNamespace() + "/models/item/" + rl.getPath() + ".json");
-
 			try {
 				IDataProvider.save(GSON, cache, GSON.fromJson(BLOCKSTATE, JsonElement.class), blockStatePath);
 				IDataProvider.save(GSON, cache, GSON.fromJson(ITEM_MODEL, JsonElement.class), itemModelPath);

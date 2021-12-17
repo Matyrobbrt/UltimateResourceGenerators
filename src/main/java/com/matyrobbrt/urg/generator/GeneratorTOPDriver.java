@@ -57,7 +57,9 @@ public class GeneratorTOPDriver implements ITOPDriver {
 					.getString() + " x" + generator.getInfo().producedPerOperation + ColourCodes.WHITE + " once every "
 					+ generator.getInfo().ticksPerOperation + " ticks");
 			probeInfo.text("Ticks until next production: "
-					+ (generator.getInfo().ticksPerOperation - tile.ticksSinceLastProduction));
+					+ (generator.getInfo().ticksPerOperation - tile.ticksSinceLastProduction >= 0
+							? generator.getInfo().ticksPerOperation - tile.ticksSinceLastProduction
+							: 0));
 
 			if (generator.getInfo().maxProduced != -1) {
 				probeInfo.text("Can produce " + ColourCodes.GOLD + generator.getInfo().maxProduced + ColourCodes.WHITE

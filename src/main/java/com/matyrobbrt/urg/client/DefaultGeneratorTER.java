@@ -50,13 +50,11 @@ public class DefaultGeneratorTER extends TileEntityRenderer<GeneratorTileEntity>
 
 	public static final int MAX_LIGHT_LEVEL = 15728640;
 
-	private Minecraft mc = Minecraft.getInstance();
+	private static final Minecraft mc = Minecraft.getInstance();
 
 	public DefaultGeneratorTER(TileEntityRendererDispatcher dispatcher) {
 		super(dispatcher);
 	}
-
-	public float rotatedDegrees = 0f;
 
 	@Override
 	public void render(GeneratorTileEntity generator, float pPartialTicks, MatrixStack pMatrixStack,
@@ -71,19 +69,18 @@ public class DefaultGeneratorTER extends TileEntityRenderer<GeneratorTileEntity>
 			return;
 		}
 
-		rotatedDegrees++;
-		if (rotatedDegrees > 360f) {
-			rotatedDegrees = 0f;
+		generator.renderDegrees += generatorBlock.getTileRenderInfo().rotationSpeed;
+		if (generator.renderDegrees > 360f) {
+			generator.renderDegrees = 0f;
 		}
 
 		renderItem(new ItemStack(generatorBlock.getProducedItem(), generatorBlock.getProducedPerOperation()),
-				generatorBlock.getTileRenderInfo().translation, Vector3f.YP.rotationDegrees(rotatedDegrees),
-				pMatrixStack, pBuffer, pPartialTicks, pCombinedOverlay, MAX_LIGHT_LEVEL,
-				generatorBlock.getTileRenderInfo().scale);
+				generatorBlock.getTileRenderInfo().translation, Vector3f.YP.rotationDegrees(generator.renderDegrees),
+				pMatrixStack, pBuffer, pCombinedOverlay, MAX_LIGHT_LEVEL, generatorBlock.getTileRenderInfo().scale);
 	}
 
-	private void renderItem(ItemStack stack, double[] translation, Quaternion rotation, MatrixStack matrixStack,
-			IRenderTypeBuffer buffer, float partialTicks, int combinedOverlay, int lightLevel, float scale) {
+	public static void renderItem(ItemStack stack, double[] translation, Quaternion rotation, MatrixStack matrixStack,
+			IRenderTypeBuffer buffer, int combinedOverlay, int lightLevel, float scale) {
 		matrixStack.pushPose();
 		matrixStack.translate(translation[0], translation[1], translation[2]);
 		matrixStack.mulPose(rotation);

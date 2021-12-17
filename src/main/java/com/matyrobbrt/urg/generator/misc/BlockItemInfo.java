@@ -34,6 +34,8 @@ import net.minecraft.item.Rarity;
 
 public class BlockItemInfo {
 
+	public static final BlockItemInfo DEFAULT = new BlockItemInfo();
+
 	@Expose
 	@SerializedName("stack_size")
 	public int stackSize = 64;

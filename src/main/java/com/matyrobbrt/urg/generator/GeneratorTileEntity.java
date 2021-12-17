@@ -28,6 +28,7 @@
 package com.matyrobbrt.urg.generator;
 
 import com.matyrobbrt.lib.annotation.SyncValue;
+import com.matyrobbrt.urg.client.DefaultGeneratorTER;
 import com.matyrobbrt.urg.generator.misc.FEInfo;
 import com.matyrobbrt.urg.generator.misc.URGEnergyStorage;
 
@@ -60,6 +61,11 @@ import net.minecraftforge.registries.ForgeRegistries;
  * @author matyrobbrt
  */
 public class GeneratorTileEntity extends TileEntity implements ITickableTileEntity {
+
+	/**
+	 * Only used client-side in {@link DefaultGeneratorTER}
+	 */
+	public float renderDegrees;
 
 	private Item producedItem;
 	private int producedPerOperation = 1;
@@ -182,7 +188,9 @@ public class GeneratorTileEntity extends TileEntity implements ITickableTileEnti
 	}
 
 	public void serverTick() {
-		handleAutoOutput(Direction.UP);
+		if (!autoOutputs()) {
+			handleAutoOutput(Direction.UP);
+		}
 
 		if (alreadyProduced >= maxProduced && maxProduced != -1) { return; }
 

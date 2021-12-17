@@ -92,6 +92,17 @@ public class URGDataGen extends URGGeneratorProvider {
 		createVanillaGenerator(Items.SOUL_SAND);
 		createVanillaGenerator(Items.SNOW);
 		createVanillaGenerator(Items.ICE);
+
+		/*
+		 * createVanillaGenerator(Items.NETHERITE_BLOCK, info -> {
+		 * info.blockItemInfo.rarity = "EPIC"; info.blockItemInfo.stackSize = 12;
+		 * 
+		 * info.feInfo.feUsedPerTick = 400; info.feInfo.feTransferRate = 410;
+		 * info.feInfo.usesFE = true;
+		 * 
+		 * info.ticksPerOperation = 400; info.autoOutput = false;
+		 * info.blockProperties.lightLevel = 7; info.maxProduced = 16; });
+		 */
 	}
 
 	private void createVanillaGenerator(Item item) {

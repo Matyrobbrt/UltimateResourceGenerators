@@ -73,6 +73,12 @@ public class URGGeneratorsReloadListener extends JsonReloadListener {
 	public void update(Map<ResourceLocation, JsonElement> objects) {
 		UltimateResourceGenerators.LOGGER.info("Started updating generators information...");
 		objects.forEach((rl, obj) -> generatorInfos.put(rl, GeneratorBlockParser.infoFromJson((JsonObject) obj)));
+		generatorInfos.forEach((rl, info) -> {
+			info.redirect(URGPackFinder.getRedirectForName(rl));
+			if (!info.copyFrom.isEmpty()) {
+				info.redirect(getInfoForRL(new ResourceLocation(info.copyFrom)));
+			}
+		});
 		UltimateResourceGenerators.LOGGER.info("Done updating generators information!");
 	}
 

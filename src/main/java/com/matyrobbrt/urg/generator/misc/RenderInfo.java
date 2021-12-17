@@ -32,6 +32,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class RenderInfo {
 
+	public static final RenderInfo DEFAULT = new RenderInfo();
+
 	@Expose
 	@SerializedName("uses_default_renderer")
 	public boolean usesDefaultRender = false;
@@ -43,5 +45,9 @@ public class RenderInfo {
 
 	@Expose
 	public float scale = 0.8f;
+
+	@Expose
+	@SerializedName("rotation_speed")
+	public float rotationSpeed = 3.0f;
 
 }

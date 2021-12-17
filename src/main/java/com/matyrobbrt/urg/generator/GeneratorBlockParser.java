@@ -99,6 +99,9 @@ public class GeneratorBlockParser {
 		if (info.producedPerOperation > 64) {
 			info.producedPerOperation = 64;
 		}
+		if (!info.copyFrom.isEmpty()) {
+			info.redirect(URGGeneratorsReloadListener.INSTANCE.getInfoForRL(new ResourceLocation(info.copyFrom)));
+		}
 		return info;
 	}
 
