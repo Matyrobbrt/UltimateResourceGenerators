@@ -51,6 +51,7 @@ import com.matyrobbrt.lib.wrench.IWrenchBehaviour;
 import com.matyrobbrt.lib.wrench.WrenchIMC;
 import com.matyrobbrt.lib.wrench.WrenchMode;
 import com.matyrobbrt.lib.wrench.WrenchResult;
+import com.matyrobbrt.urg.client.URGClientSetup;
 import com.matyrobbrt.urg.generator.GeneratorBlock;
 import com.matyrobbrt.urg.generator.GeneratorTileEntity.ItemHandler;
 import com.matyrobbrt.urg.generator.misc.URGEnergyStorage;
@@ -61,7 +62,6 @@ import com.matyrobbrt.urg.packs.URGResourceManager;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.ReportedException;
 import net.minecraft.entity.item.ItemEntity;
@@ -78,7 +78,6 @@ import net.minecraft.world.server.ServerWorld;
 
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -223,18 +222,6 @@ public class UltimateResourceGenerators extends ModSetup {
 	};
 
 	public static boolean isProduction() { return true; }
-
-	private static final class URGClientSetup extends ClientSetup {
-
-		public URGClientSetup(IEventBus modBus) {
-			super(modBus);
-			if (Minecraft.getInstance() != null) {
-				ResourcePackList packs = Minecraft.getInstance().getResourcePackRepository();
-				addPacks(packs);
-			}
-		}
-
-	}
 
 	public static void addPacks(ResourcePackList packs) {
 		packs.addPackFinder(URGPackFinder.FINDER);

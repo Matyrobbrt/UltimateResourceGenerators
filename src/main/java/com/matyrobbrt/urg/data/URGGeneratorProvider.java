@@ -84,7 +84,7 @@ public class URGGeneratorProvider implements IDataProvider {
 		Path outputFolder = Paths.get(FMLPaths.GAMEDIR.get().resolve("../../dev_urg_packs").toFile().getPath());
 
 		try {
-			FileUtils.deleteDirectory(outputFolder.resolve(packName + "/assets").toFile());
+			FileUtils.deleteDirectory(outputFolder.resolve(packName + "/assets/item").toFile());
 			FileUtils.deleteDirectory(outputFolder.resolve(packName + "/data").toFile());
 		} catch (IOException e1) {}
 

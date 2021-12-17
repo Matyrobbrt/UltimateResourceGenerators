@@ -33,10 +33,9 @@ import java.util.function.Function;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.matyrobbrt.urg.client.URGClientSetup;
 import com.matyrobbrt.urg.generator.GeneratorBlockParser;
-import com.matyrobbrt.urg.registries.URGRegistries;
 
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 
@@ -49,7 +48,7 @@ public class GeneratorInfo implements Cloneable {
 	public BlockProperties blockProperties = BlockProperties.DEFAULT;
 
 	/**
-	 * @deprecated Use {@link #getRenderType()}
+	 * @deprecated Use {@link URGClientSetup#getRenderType(GeneratorInfo)}
 	 */
 	@Expose
 	@SerializedName("render_type")
@@ -104,9 +103,9 @@ public class GeneratorInfo implements Cloneable {
 	@SerializedName("copy_from")
 	public String copyFrom = "";
 
-	public Item getProducedItem() { return ForgeRegistries.ITEMS.getValue(new ResourceLocation(producedItem)); }
+	public String getCopyTarget() { return copyFrom; }
 
-	public RenderType getRenderType() { return URGRegistries.RENDER_TYPES.get(new ResourceLocation(renderType)); }
+	public Item getProducedItem() { return ForgeRegistries.ITEMS.getValue(new ResourceLocation(producedItem)); }
 
 	public static final GeneratorInfo DEFAULT = new GeneratorInfo();
 

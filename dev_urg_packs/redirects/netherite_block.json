@@ -1,14 +1,5 @@
 {
-	"vanilla_urg:netherite_block_generator": {
-		"tile_entity_renderer": {
-			"uses_default_renderer": true,
-			"translation": [
-				0.3,
-				0.4,
-				0.3
-			],
-			"scale": 1,
-			"rotation_speed": 10
-		}
+	"vanilla_urg:diamond_generator": {
+		"copy_from": "vanilla_urg:sand_generator"
 	}
 }

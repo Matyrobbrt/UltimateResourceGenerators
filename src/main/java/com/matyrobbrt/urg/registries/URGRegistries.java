@@ -33,7 +33,6 @@ import com.matyrobbrt.urg.UltimateResourceGenerators;
 import com.mojang.serialization.Lifecycle;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
@@ -42,54 +41,23 @@ import net.minecraft.util.registry.SimpleRegistry;
 public class URGRegistries {
 
 	public static final RegistryKey<Registry<Registry<?>>> URG_REGISTRIES_REGISTRY = createKey("registries");
-	public static final RegistryKey<Registry<RenderType>> RENDER_TYPE_REGISTRY = createKey("render_type");
 	public static final RegistryKey<Registry<Material>> BLOCK_MATERIAL_REGISTRY = createKey("block_material");
 
 	public static final Registry<Registry<?>> URG_REGISTRIES = new SimpleRegistry<>(URG_REGISTRIES_REGISTRY,
 			Lifecycle.experimental());
-	public static final Registry<RenderType> RENDER_TYPES = makeRegistry(RENDER_TYPE_REGISTRY);
 	public static final Registry<Material> BLOCK_MATERIALS = makeRegistry(BLOCK_MATERIAL_REGISTRY);
 
-	private static <T> RegistryKey<Registry<T>> createKey(String name) {
+	static <T> RegistryKey<Registry<T>> createKey(String name) {
 		return RegistryKey.createRegistryKey(new ResourceLocation(UltimateResourceGenerators.MOD_ID, name));
 	}
 
-	private static <T> Registry<T> makeRegistry(RegistryKey<Registry<T>> key) {
+	static <T> Registry<T> makeRegistry(RegistryKey<Registry<T>> key) {
 		SimpleRegistry<T> registry = new SimpleRegistry<>(key, Lifecycle.experimental());
 		return Registry.register(URG_REGISTRIES, key.location().toString(), registry);
 	}
 
 	static {
-		registerRenderTypes();
 		registerMaterials();
-	}
-
-	private static void registerRenderTypes() {
-		register(RENDER_TYPES, "cutout", RenderType.cutout());
-		register(RENDER_TYPES, "cutout_mipped", RenderType.cutoutMipped());
-		register(RENDER_TYPES, "solid", RenderType.solid());
-
-		register(RENDER_TYPES, "translucent", RenderType.translucent());
-		register(RENDER_TYPES, "translucent_moving_block", RenderType.translucentMovingBlock());
-		// register(RENDER_TYPES, "translucent_no_crumbling",
-		// RenderType.translucentNoCrumbling());
-
-		register(RENDER_TYPES, "leash", RenderType.leash());
-		register(RENDER_TYPES, "water_mask", RenderType.waterMask());
-
-		register(RENDER_TYPES, "armor_glint", RenderType.armorGlint());
-		register(RENDER_TYPES, "armor_entity_glint", RenderType.armorEntityGlint());
-
-		register(RENDER_TYPES, "glint", RenderType.glint());
-		register(RENDER_TYPES, "glint_translucent", RenderType.glintTranslucent());
-		register(RENDER_TYPES, "glint_direct", RenderType.glintDirect());
-
-		register(RENDER_TYPES, "entity_glint_direct", RenderType.entityGlintDirect());
-		register(RENDER_TYPES, "entity_glint", RenderType.entityGlint());
-
-		register(RENDER_TYPES, "lighting", RenderType.lightning());
-		register(RENDER_TYPES, "tripwire", RenderType.tripwire());
-		register(RENDER_TYPES, "lines", RenderType.lines());
 	}
 
 	private static void registerMaterials() {
