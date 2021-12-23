@@ -1,9 +1,0 @@
-{
-	"itemGroup.urg": "Ultimate Resource Generators",
-	
-	"tooltip.urg.hold_shift": "Hold \u00A76SHIFT\u00A7r for more information!",
-	"tooltip.urg.fe_usage": "Uses \u00A72$0FE\u00A7r / tick",
-	"tooltip.urg.max_produced": "Can produce \u00A76$0\u00A7r total items",
-	"tooltip.urg.max_produced.infinite": "Can produce \u00A76infinite\u00A7r items",
-	"tooltip.urg.auto_output": "Automatically outputs to an inventory above!"
-}
